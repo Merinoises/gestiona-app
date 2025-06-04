@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:gestiona_app/controllers/pool_controller.dart';
 import 'package:gestiona_app/services/auth_service.dart';
 import 'package:gestiona_app/views/login/inicio_acceso_screen.dart';
 import 'package:gestiona_app/views/start/start_screen.dart';
@@ -26,6 +27,8 @@ class LoadingScreen extends StatelessWidget {
     final autenticado = await auth.isLoggedIn();
 
     if (autenticado) {
+      final poolCtrl = Get.find<PoolController>();
+      await poolCtrl.loadPools();
       Get.to(() => StartScreen());
     } else {
       Get.to(() => InicioAccesoScreen());

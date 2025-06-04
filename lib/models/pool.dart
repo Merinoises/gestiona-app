@@ -30,7 +30,7 @@ class TimeRange {
   String toString() {
     String fmt(TimeOfDay t) =>
         '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
-    return '${fmt(start)} – ${fmt(end)}';
+    return '${fmt(start)} a ${fmt(end)}';
   }
 
   /// Para serializar a JSON (p. ej. enviar este rango al backend)

@@ -59,16 +59,6 @@ class UsuarioController extends GetxController {
     usuario.value = nuevo;
   }
 
-  /// Cambia la tarifa horaria del usuario (solo si NO es admin).
-  /// Si es admin, lanza excepción.
-  void updateTarifa(double nuevaTarifa) {
-    final u = user;
-    if (u.isAdmin) {
-      throw Exception('No se puede actualizar tarifa de un administrador');
-    }
-    usuario.value = u.copyWith(tarifaHoraria: nuevaTarifa);
-  }
-
   /// Agrega un turno nuevo al usuario (y notifica a la UI).
   /// [turno] debe contener el objeto Pool completo.
   void addTurno(Turno turno) {

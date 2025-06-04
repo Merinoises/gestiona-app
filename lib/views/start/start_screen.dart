@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gestiona_app/global/environment.dart';
 import 'package:gestiona_app/views/anadir/add_pool_screen.dart';
+import 'package:gestiona_app/views/anadir/add_socorrista_screen.dart';
+import 'package:gestiona_app/views/piscinas/piscinas_screen.dart';
 import 'package:gestiona_app/widgets/main_page/card_seleccion.dart';
 import 'package:gestiona_app/widgets/main_page/misc_card.dart';
 import 'package:get/get.dart';
@@ -34,7 +36,7 @@ class StartScreen extends StatelessWidget {
                   alturaCard: MediaQuery.of(context).size.height * (1 / 6),
                   anchuraCard: MediaQuery.of(context).size.height * 0.8,
                   onPressed: () {
-                    print('Ir a piscinas');
+                    Get.to(() => PiscinasScreen());
                   },
                 ),
                 // SizedBox(height: 20,),
@@ -54,7 +56,6 @@ class StartScreen extends StatelessWidget {
                           '${Environment.apiUrl}/images/anadir-piscina.png',
                       titulo: 'Añadir piscina',
                       onPressed: () {
-                        print('Añadir piscina');
                         Get.to(() => AddPoolScreen());
                       },
                     ),
@@ -63,7 +64,9 @@ class StartScreen extends StatelessWidget {
                       rutaALaImagenDeFondo:
                           '${Environment.apiUrl}/images/anadir-socorrista.png',
                       titulo: 'Añadir socorrista',
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(() => AddSocorristaScreen());
+                      },
                     ),
                   ],
                 ),

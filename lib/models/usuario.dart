@@ -10,11 +10,9 @@ class Usuario {
   final DateTime? createdAt;
 
   /// Si true → este usuario es administrador (no tiene turnos ni tarifas).
-  /// Si false → es socorrista y debe tener tarifaHoraria y turnos.
   final bool isAdmin;
 
   /// €/hora para el socorrista. Si isAdmin == true, queda en null.
-  final double? tarifaHoraria;
 
   /// Lista de turnos asignados (solo para socorristas).
   final List<Turno> turnos;
@@ -22,10 +20,9 @@ class Usuario {
   Usuario({
     this.id,
     required this.nombre,
-    required this.password,
+    this.password,
     this.createdAt,
-    this.isAdmin = false,
-    this.tarifaHoraria,
+    required this.isAdmin,
     List<Turno>? turnos,
   }) : turnos = turnos ?? [];
 
@@ -35,7 +32,6 @@ class Usuario {
     List<Pool> allPools,
   ) {
     final bool rolAdmin = (json['isAdmin'] as bool?) ?? false;
-    final double? tarifa = (json['tarifaHoraria'] as num?)?.toDouble();
 
     // Reconstruir lista de turnos:
     final List<Turno> listaTurnos = (json['turnos'] as List<dynamic>? ?? [])
@@ -50,7 +46,6 @@ class Usuario {
           ? DateTime.parse(json['createdAt'] as String)
           : null,
       isAdmin: rolAdmin,
-      tarifaHoraria: tarifa,
       turnos: listaTurnos,
     );
   }
@@ -61,7 +56,6 @@ class Usuario {
       'nombre': nombre,
       'isAdmin': isAdmin,
       if (password != null)       'password': password!,
-      if (tarifaHoraria != null)  'tarifaHoraria': tarifaHoraria!,
     };
     if (turnos.isNotEmpty) {
       map['turnos'] = turnos.map((t) => t.toJson()).toList();
@@ -82,7 +76,6 @@ class Usuario {
     String? password,
     DateTime? createdAt,
     bool? isAdmin,
-    double? tarifaHoraria,
     List<Turno>? turnos,
   }) {
     return Usuario(
@@ -91,15 +84,13 @@ class Usuario {
       password: password ?? this.password,
       createdAt: createdAt ?? this.createdAt,
       isAdmin: isAdmin ?? this.isAdmin,
-      tarifaHoraria: tarifaHoraria ?? this.tarifaHoraria,
       turnos: turnos ?? List<Turno>.from(this.turnos),
     );
   }
 
   @override
   String toString() {
-    return 'Usuario {id: $id, nombre: $nombre, isAdmin: $isAdmin, '
-        'tarifa: $tarifaHoraria, turnos: ${turnos.length}}';
+    return 'Usuario {id: $id, nombre: $nombre, isAdmin: $isAdmin';
   }
 
   /// Acumula todas las duraciones de los turnos cuyo start.year == [anyo] y start.month == [mes].
@@ -115,9 +106,6 @@ class Usuario {
 
   /// Calcula el importe a pagar en ese [anyo]-[mes], en función de tarifaHoraria.
   double importeAPagarEnMes(int anyo, int mes) {
-    if (isAdmin || tarifaHoraria == null) return 0.0;
-    final duracionTotal = totalHorasEnMes(anyo, mes);
-    final horasDecimal = duracionTotal.inMinutes / 60.0;
-    return horasDecimal * tarifaHoraria!;
+    return 0;
   }
 }
