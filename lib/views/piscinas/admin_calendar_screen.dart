@@ -262,6 +262,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                       horaFinal.value!.minute,
                     );
                     Turno nuevoTurno = Turno(
+                      id: '',
                       pool: pool,
                       start: fechaYHoraInicio,
                       end: fechaYHoraFinal,
@@ -435,7 +436,13 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Calendario ${widget.pool.nombre}')),
+      appBar: AppBar(
+        title: Text(
+          'Calendario ${widget.pool.nombre}',
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

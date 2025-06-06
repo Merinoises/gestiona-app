@@ -101,10 +101,28 @@ class Usuario {
     return total;
   }
 
-  /// Calcula el importe a pagar en ese [anyo]-[mes], en función de tarifaHoraria.
+  // Calcula el importe a pagar en ese [anyo]-[mes], a razón de 9 €/hora,
+  /// teniendo en cuenta también los minutos parciales.
   double importeAPagarEnMes(int anyo, int mes) {
-    return 0;
+    // 1) Obtenemos la duración total de los turnos en ese mes:
+    final Duration totalDuracion = totalHorasEnMes(anyo, mes);
+
+    // 2) Convertimos la duración a minutos (enteros) y luego a horas en doble:
+    final double horasExactas = totalDuracion.inMinutes / 60.0;
+
+    // 3) A 9 €/hora:
+    return horasExactas * 9.0;
   }
 
-  
+  double importeTotalTurnos() {
+    // 1) Sumamos la duración de todos los turnos:
+    Duration duracionTotal = Duration.zero;
+    for (final turno in turnos) {
+      duracionTotal += turno.duracion;
+    }
+    // 2) Convertimos a horas en valor con decimales:
+    final double horasExactas = duracionTotal.inMinutes / 60.0;
+    // 3) A 9 €/hora:
+    return horasExactas * 9.0;
+  }
 }

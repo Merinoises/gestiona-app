@@ -12,6 +12,12 @@ class AdminPiscinasScreen extends StatelessWidget {
     final poolCtrl = Get.find<PoolController>();
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'GESTIONAR PISCINAS',
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -32,8 +38,9 @@ class AdminPiscinasScreen extends StatelessWidget {
               title: Text(poolCtrl.pools[index].nombre),
               subtitle: Text(poolCtrl.pools[index].ubicacion),
               trailing: IconButton(
-                onPressed: () =>
-                    Get.to(() => AdminCalendarioScreen(pool: poolCtrl.pools[index])),
+                onPressed: () => Get.to(
+                  () => AdminCalendarioScreen(pool: poolCtrl.pools[index]),
+                ),
                 icon: FaIcon(FontAwesomeIcons.eye),
               ),
             ),

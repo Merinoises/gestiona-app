@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/utils/aux_methods.dart';
+import 'package:gestiona_app/views/socorristas/info_socorrista_screen.dart';
 import 'package:get/get.dart';
 
 class AdminSocorristasScreen extends StatelessWidget {
   const AdminSocorristasScreen({super.key});
-
-  
-  
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +15,12 @@ class AdminSocorristasScreen extends StatelessWidget {
     final socorristasCtrl = Get.find<SocorristasController>();
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Gestionar socorristas',
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -40,19 +44,21 @@ class AdminSocorristasScreen extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: ListTile(
-                    leading: InitialsCircle(
-                      text: socorrista.nombre,
-                    ),
+                    leading: InitialsCircle(text: socorrista.nombre),
                     title: Text(
                       auxMethods.capitalize(socorrista.nombre),
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     trailing: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(
+                          () => InfoSocorristaScreen(socorrista: socorrista),
+                        );
+                      },
                       icon: FaIcon(FontAwesomeIcons.eye),
                     ),
                     tileColor: const Color.fromARGB(255, 255, 206, 221),
-                    iconColor: Colors.blue,
+                    iconColor: const Color.fromARGB(136, 5, 96, 170),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
@@ -106,7 +112,10 @@ class InitialsCircle extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(color: backgroundColor, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+        ),
         alignment: Alignment.center,
         child: Text(
           initials,
