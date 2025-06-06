@@ -27,10 +27,7 @@ class Usuario {
   }) : turnos = turnos ?? [];
 
   /// Crea un Usuario a partir de JSON de la API. Necesita allPools para reconstruir turnos.
-  factory Usuario.fromJson(
-    Map<String, dynamic> json,
-    List<Pool> allPools,
-  ) {
+  factory Usuario.fromJson(Map<String, dynamic> json, List<Pool> allPools) {
     final bool rolAdmin = (json['isAdmin'] as bool?) ?? false;
 
     // Reconstruir lista de turnos:
@@ -55,7 +52,7 @@ class Usuario {
     final map = <String, dynamic>{
       'nombre': nombre,
       'isAdmin': isAdmin,
-      if (password != null)       'password': password!,
+      if (password != null) 'password': password!,
     };
     if (turnos.isNotEmpty) {
       map['turnos'] = turnos.map((t) => t.toJson()).toList();
@@ -108,4 +105,6 @@ class Usuario {
   double importeAPagarEnMes(int anyo, int mes) {
     return 0;
   }
+
+  
 }

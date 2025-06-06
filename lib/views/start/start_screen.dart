@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gestiona_app/global/environment.dart';
 import 'package:gestiona_app/views/anadir/add_pool_screen.dart';
 import 'package:gestiona_app/views/anadir/add_socorrista_screen.dart';
-import 'package:gestiona_app/views/piscinas/piscinas_screen.dart';
+import 'package:gestiona_app/views/piscinas/admin_piscinas_screen.dart';
+import 'package:gestiona_app/views/socorristas/admin_socorristas_screen.dart';
 import 'package:gestiona_app/widgets/main_page/card_seleccion.dart';
 import 'package:gestiona_app/widgets/main_page/misc_card.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,7 @@ class StartScreen extends StatelessWidget {
                   alturaCard: MediaQuery.of(context).size.height * (1 / 6),
                   anchuraCard: MediaQuery.of(context).size.height * 0.8,
                   onPressed: () {
-                    Get.to(() => PiscinasScreen());
+                    Get.to(() => AdminPiscinasScreen());
                   },
                 ),
                 // SizedBox(height: 20,),
@@ -46,7 +47,9 @@ class StartScreen extends StatelessWidget {
                   titulo: 'Socorristas',
                   alturaCard: MediaQuery.of(context).size.height * (1 / 6),
                   anchuraCard: MediaQuery.of(context).size.height * 0.8,
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => AdminSocorristasScreen());
+                  },
                 ),
 
                 Row(

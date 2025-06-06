@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/models/usuario.dart';
+import 'package:get/get.dart';
 
 class AddSocorristaScreen extends StatelessWidget {
   AddSocorristaScreen({super.key});
@@ -85,9 +87,17 @@ class AddSocorristaScreen extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      
                       _formKey.currentState!.save();
-                      final Usuario usuario = Usuario(nombre: nombre, password: password, isAdmin: false);
-                      print(usuario);
+                      final Usuario nuevoSocorrista = Usuario(nombre: nombre, password: password, isAdmin: false);
+                      final socorristasCtrl = Get.find<SocorristasController>();
+                      final String? resp = await socorristasCtrl.createSocorrista(nuevoSocorrista);
+                      if (resp == null) {
+                        Get.back();
+                        Get.snackbar('Socorrista creado', 'Socorrista $nombre ha sido creado.', colorText: Colors.white, duration: Duration(seconds: 3));
+                      } else {
+                        Get.snackbar('Error al crear socorrista', resp, backgroundColor: Colors.red[400], colorText: Colors.white, duration: Duration(seconds: 3));
+                      }
                     }
                   },
                   style: ButtonStyle(

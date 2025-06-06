@@ -28,6 +28,16 @@ class Turno {
     return '${pool.nombre}: $hIni:$mIni – $hFin:$mFin ($hTot h $mTot m)';
   }
 
+  String stringSoloHoras() {
+    final hIni = start.hour.toString().padLeft(2, '0');
+    final mIni = start.minute.toString().padLeft(2, '0');
+    final hFin = end.hour.toString().padLeft(2, '0');
+    final mFin = end.minute.toString().padLeft(2, '0');
+    final hTot = duracion.inHours;
+    final mTot = duracion.inMinutes.remainder(60);
+    return '🕒 $hIni:$mIni – $hFin:$mFin ($hTot h $mTot m)';
+  }
+
   /// Para serializar a JSON:
   /// {
   ///   "poolId": "<id de la piscina>",
@@ -37,8 +47,8 @@ class Turno {
   Map<String, dynamic> toJson() {
     return {
       'poolId': pool.id,
-      'start': start.toIso8601String(),
-      'end': end.toIso8601String(),
+      'start': start.toUtc().toIso8601String(),
+      'end': end.toUtc().toIso8601String(),
     };
   }
 
@@ -54,8 +64,8 @@ class Turno {
     );
     return Turno(
       pool: poolMatch,
-      start: DateTime.parse(json['start'] as String),
-      end: DateTime.parse(json['end'] as String),
+      start: DateTime.parse(json['start'] as String).toLocal(),
+      end: DateTime.parse(json['end'] as String).toLocal(),
     );
   }
 }

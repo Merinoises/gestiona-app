@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestiona_app/controllers/add_pool_controller.dart';
 import 'package:gestiona_app/controllers/pool_controller.dart';
+import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/services/auth_service.dart';
 import 'package:gestiona_app/views/login/loading.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ void main() async {
   Get.put(AuthService());
   Get.put(PoolController());
   Get.put(AddPoolController());
+  Get.put(SocorristasController());
   runApp(const MainApp());
 }
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gestiona_app/controllers/pool_controller.dart';
-import 'package:gestiona_app/views/piscinas/calendar_screen.dart';
+import 'package:gestiona_app/views/piscinas/admin_calendar_screen.dart';
 import 'package:get/get.dart';
 
-class PiscinasScreen extends StatelessWidget {
-  const PiscinasScreen({super.key});
+class AdminPiscinasScreen extends StatelessWidget {
+  const AdminPiscinasScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class PiscinasScreen extends StatelessWidget {
               subtitle: Text(poolCtrl.pools[index].ubicacion),
               trailing: IconButton(
                 onPressed: () =>
-                    Get.to(() => CalendarioScreen(pool: poolCtrl.pools[index])),
+                    Get.to(() => AdminCalendarioScreen(pool: poolCtrl.pools[index])),
                 icon: FaIcon(FontAwesomeIcons.eye),
               ),
             ),

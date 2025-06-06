@@ -1,7 +1,7 @@
 // usuario_controller.dart
 
+import 'package:gestiona_app/controllers/pool_controller.dart';
 import 'package:get/get.dart';
-import 'package:gestiona_app/models/pool.dart';
 import 'package:gestiona_app/models/turno.dart';
 import 'package:gestiona_app/models/usuario.dart';
 
@@ -11,8 +11,6 @@ class UsuarioController extends GetxController {
   /// El usuario actual. Si no hay nadie logueado, será `null`.
   final Rxn<Usuario> usuario = Rxn<Usuario>();
 
-  /// Lista de todas las piscinas (necesaria para reconstruir turnos al actualizar usuario desde JSON).
-  final RxList<Pool> allPools = <Pool>[].obs;
 
   @override
   void onInit() {
@@ -42,20 +40,15 @@ class UsuarioController extends GetxController {
     usuario.value = null;
   }
 
-  /// Actualiza la lista de piscinas (por ejemplo, después de _cargarTodasLasPiscinas).
-  /// Esto es necesario si luego quieres reconstruir turnos desde JSON.
-  void setPools(List<Pool> pools) {
-    allPools.assignAll(pools);
-  }
-
   /// Actualiza el usuario a partir de JSON (por ejemplo, cuando renuevas token).
   /// Necesita [allPools] ya cargadas para poder reconstruir los turnos.
   void updateUsuarioFromJson(Map<String, dynamic> json) {
+    final poolCtrl = Get.find<PoolController>();
     // Asegurarnos de que allPools no esté vacío
-    if (allPools.isEmpty) {
+    if (poolCtrl.pools.isEmpty) {
       throw Exception('Debe llamar a setPools(...) antes de reconstruir Usuario desde JSON');
     }
-    final nuevo = Usuario.fromJson(json, allPools);
+    final nuevo = Usuario.fromJson(json, poolCtrl.pools);
     usuario.value = nuevo;
   }
 
