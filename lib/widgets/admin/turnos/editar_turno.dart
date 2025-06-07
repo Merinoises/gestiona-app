@@ -1,245 +1,317 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:gestiona_app/controllers/socorristas_controller.dart';
+import 'package:gestiona_app/models/pool.dart';
+import 'package:gestiona_app/models/turno.dart';
+import 'package:gestiona_app/models/usuario.dart';
+import 'package:gestiona_app/utils/aux_methods.dart';
+import 'package:get/get.dart';
 
-// class EditarTurno extends StatelessWidget {
-//   const EditarTurno({super.key});
+class EditarTurno extends StatelessWidget {
+  final Turno turno;
+  final String nombreSocorrista;
+  final Pool pool;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return AlertDialog(
-//       backgroundColor: Colors
-//           .transparent, // opcional: para que el degradado sea visible en los bordes
-//       contentPadding: EdgeInsets
-//           .zero, // para que el contenido ocupe todo el espacio disponible dentro del AlertDialog
-//       content: Container(
-//         decoration: const BoxDecoration(
-//           borderRadius: BorderRadius.all(Radius.circular(8)),
-//           gradient: LinearGradient(
-//             begin: Alignment.topLeft, // Punto de inicio del degradado
-//             end: Alignment.bottomRight, // Punto final del degradado
-//             colors: [
-//               Color.fromARGB(255, 255, 255, 255), // Color inicial
-//               Color.fromARGB(255, 191, 237, 255), // Color final
-//             ],
-//           ),
-//         ),
-//         child: Padding(
-//           padding: const EdgeInsets.all(8.0),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.center,
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Text(
-//                 'CREAR HORARIO DE SOCORRISTA',
-//                 style: TextStyle(fontWeight: FontWeight.bold),
-//               ),
-//               SizedBox(height: 30),
-//               Text(
-//                 'Selección de socorrista',
-//                 style: TextStyle(fontWeight: FontWeight.bold),
-//               ),
-//               SizedBox(height: 10),
-//               Form(
-//                 key: _formKey,
-//                 child: DropdownButtonFormField<Usuario>(
-//                   decoration: InputDecoration(
-//                     labelText: 'Socorrista',
-//                     border: const OutlineInputBorder(),
-//                     contentPadding: const EdgeInsets.symmetric(
-//                       horizontal: 12,
-//                       vertical: 8,
-//                     ),
-//                   ),
-//                   items: listaSocorristas.map((Usuario s) {
-//                     return DropdownMenuItem<Usuario>(
-//                       value: s,
-//                       child: Text(s.nombre),
-//                     );
-//                   }).toList(),
-//                   value: socorristaSeleccionado.value,
-//                   hint: const Text('Selecciona un socorrista'),
-//                   onChanged: (socorrista) {
-//                     socorristaSeleccionado.value = socorrista;
-//                   },
-//                   validator: (value) {
-//                     if (value == null) {
-//                       return 'Debes elegir un socorrista';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//               ),
-//               SizedBox(height: 10),
-//               Text(
-//                 'Horas de inicio y finalización',
-//                 style: TextStyle(fontWeight: FontWeight.bold),
-//               ),
+  const EditarTurno({
+    super.key,
+    required this.turno,
+    required this.nombreSocorrista,
+    required this.pool,
+  });
 
-//               SizedBox(height: 10),
-//               Obx(
-//                 () => Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Column(
-//                       children: [
-//                         ElevatedButton(
-//                           onPressed: () async {
-//                             horaInicio.value = await pickHoraInicio(context);
-//                           },
-//                           child: Text('Hora inicial'),
-//                         ),
-//                         horaInicio.value != null
-//                             ? SizedBox(height: 10)
-//                             : SizedBox.shrink(),
-//                         horaInicio.value != null
-//                             ? Text(
-//                                 horaInicio.value!.format(context),
-//                                 style: TextStyle(fontWeight: FontWeight.bold),
-//                               )
-//                             : SizedBox.shrink(),
-//                       ],
-//                     ),
+  @override
+  Widget build(BuildContext context) {
+    final AuxMethods auxMethods = AuxMethods();
+    final formKey = GlobalKey<FormState>();
 
-//                     SizedBox(width: 10),
-//                     Column(
-//                       children: [
-//                         ElevatedButton(
-//                           onPressed: () async {
-//                             horaFinal.value = await pickHoraFinalizacion(
-//                               context,
-//                             );
-//                           },
-//                           child: Text('Hora final'),
-//                         ),
-//                         horaFinal.value != null
-//                             ? SizedBox(height: 10)
-//                             : SizedBox.shrink(),
-//                         horaFinal.value != null
-//                             ? Text(
-//                                 horaFinal.value!.format(context),
-//                                 style: TextStyle(fontWeight: FontWeight.bold),
-//                               )
-//                             : SizedBox.shrink(),
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ),
+    final SocorristasController socorristasCtrl =
+        Get.find<SocorristasController>();
 
-//               SizedBox(height: 20),
-//               ElevatedButton(
-//                 onPressed: () async {
-//                   if (!_formKey.currentState!.validate()) {
-//                     // Si el dropdown no está seleccionado, no continua
-//                     return;
-//                   }
-//                   if (horaInicio.value == null || horaFinal.value == null) {
-//                     mensajeError.value =
-//                         'Escoja la hora de inicio y finalización';
-//                     print(mensajeError);
-//                     return;
-//                   }
-//                   // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
-//                   final int newStartMin =
-//                       horaInicio.value!.hour * 60 + horaInicio.value!.minute;
-//                   final int newEndMin =
-//                       horaFinal.value!.hour * 60 + horaFinal.value!.minute;
-//                   if (newStartMin > newEndMin) {
-//                     mensajeError.value =
-//                         'La hora de finalización ha de ser posterior a la de inicio';
-//                     print(mensajeError);
-//                     return;
-//                   }
+    Rx<TimeOfDay?> rxHoraInicio = socorristasCtrl.horaInicioTurno;
+    Rx<TimeOfDay?> rxHoraFinal = socorristasCtrl.horaFinalTurno;
+    Rx<String> rxMensajeError = socorristasCtrl.mensajeError;
+    Rx<Usuario?> socorristaSeleccionado =
+        socorristasCtrl.socorristaSeleccionado;
 
-//                   final fechaYHoraInicio = DateTime(
-//                     fechaDia.year,
-//                     fechaDia.month,
-//                     fechaDia.day,
-//                     horaInicio.value!.hour,
-//                     horaInicio.value!.minute,
-//                   );
-//                   final fechaYHoraFinal = DateTime(
-//                     fechaDia.year,
-//                     fechaDia.month,
-//                     fechaDia.day,
-//                     horaFinal.value!.hour,
-//                     horaFinal.value!.minute,
-//                   );
-//                   Turno nuevoTurno = Turno(
-//                     id: '',
-//                     pool: pool,
-//                     start: fechaYHoraInicio,
-//                     end: fechaYHoraFinal,
-//                   );
-//                   print(nuevoTurno);
-//                   socorristasCtrl.loading.value = true;
-//                   final String? resp = await socorristasCtrl
-//                       .asignarHorarioEnPiscina(
-//                         nuevoTurno,
-//                         socorristaSeleccionado.value!,
-//                       );
-//                   if (resp == null) {
-//                     Get.back();
-//                     socorristasCtrl.loading.value = false;
-//                     final index = listaSocorristas.indexWhere(
-//                       (u) => u.id == socorristaSeleccionado.value!.id,
-//                     );
-//                     final Usuario socorristaModificado =
-//                         listaSocorristas[index];
-//                     setState(() {
-//                       return;
-//                     });
-//                     Get.snackbar(
-//                       'Turno agregado a ${socorristaModificado.nombre}',
-//                       'Añadido el turno $nuevoTurno',
-//                       duration: Duration(seconds: 3),
-//                       backgroundColor: Colors.white,
-//                     );
-//                   } else {
-//                     Get.back();
-//                     socorristasCtrl.loading.value = false;
-//                     Get.snackbar('Error', resp);
-//                   }
+    TimeOfDay horaInicio = TimeOfDay(
+      hour: turno.start.hour,
+      minute: turno.start.minute,
+    );
+    TimeOfDay horaFinal = TimeOfDay(
+      hour: turno.end.hour,
+      minute: turno.end.minute,
+    );
 
-//                   // listaHorarios.add(nuevoHorario);
-//                   // selectedDays = List.filled(7, false);
-//                   // horaInicio.value = null;
-//                   // horaFinal.value = null;
-//                   // mensajeError.value = '';
-//                   // Get.back();
-//                 },
-//                 style: ButtonStyle(
-//                   backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
-//                 ),
-//                 child: Obx(() {
-//                   return socorristasCtrl.loading.value
-//                       ? Center(child: CircularProgressIndicator())
-//                       : Text(
-//                           'Guardar horario',
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontWeight: FontWeight.bold,
-//                           ),
-//                         );
-//                 }),
-//               ),
-//               SizedBox(height: 8),
-//               Obx(
-//                 () => mensajeError.value != ''
-//                     ? Text(
-//                         mensajeError.value,
-//                         style: TextStyle(
-//                           color: Colors.red,
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       )
-//                     : SizedBox.shrink(),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+    rxHoraInicio.value = horaInicio;
+    rxHoraFinal.value = horaFinal;
+    rxMensajeError.value = '';
+    socorristaSeleccionado.value = socorristasCtrl.getSocorristaByNombre(
+      nombreSocorrista,
+    );
+
+    List<Usuario> listaSocorristas = socorristasCtrl.socorristas;
+
+    return AlertDialog(
+      backgroundColor: Colors
+          .transparent, // opcional: para que el degradado sea visible en los bordes
+      contentPadding: EdgeInsets
+          .zero, // para que el contenido ocupe todo el espacio disponible dentro del AlertDialog
+      content: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft, // Punto de inicio del degradado
+            end: Alignment.bottomRight, // Punto final del degradado
+            colors: [
+              Color.fromARGB(255, 255, 255, 255), // Color inicial
+              Color.fromARGB(255, 191, 237, 255), // Color final
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'EDITAR HORARIO DE SOCORRISTA',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 30),
+              Text(
+                'Selección de socorrista',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Form(
+                key: formKey,
+                child: DropdownButtonFormField<Usuario>(
+                  decoration: InputDecoration(
+                    labelText: 'Socorrista',
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                  items: listaSocorristas.map((Usuario s) {
+                    return DropdownMenuItem<Usuario>(
+                      value: s,
+                      child: Text(s.nombre),
+                    );
+                  }).toList(),
+                  value: socorristaSeleccionado.value,
+                  hint: const Text('Selecciona un socorrista'),
+                  onChanged: (socorrista) {
+                    socorristaSeleccionado.value = socorrista;
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Debes elegir un socorrista';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Horas de inicio y finalización',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              SizedBox(height: 10),
+              Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            rxHoraInicio.value = await auxMethods
+                                .pickHoraInicio(context);
+                          },
+                          child: Text('Hora inicial'),
+                        ),
+                        rxHoraInicio.value != null
+                            ? SizedBox(height: 10)
+                            : SizedBox.shrink(),
+                        rxHoraInicio.value != null
+                            ? Text(
+                                rxHoraInicio.value!.format(context),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )
+                            : SizedBox.shrink(),
+                      ],
+                    ),
+
+                    SizedBox(width: 10),
+                    Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            rxHoraFinal.value = await auxMethods
+                                .pickHoraFinalizacion(context);
+                          },
+                          child: Text('Hora final'),
+                        ),
+                        rxHoraFinal.value != null
+                            ? SizedBox(height: 10)
+                            : SizedBox.shrink(),
+                        rxHoraFinal.value != null
+                            ? Text(
+                                rxHoraFinal.value!.format(context),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )
+                            : SizedBox.shrink(),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  if (!formKey.currentState!.validate()) {
+                    // Si el dropdown no está seleccionado, no continua
+                    return;
+                  }
+                  if (rxHoraInicio.value == null || rxHoraFinal.value == null) {
+                    rxMensajeError.value =
+                        'Escoja la hora de inicio y finalización';
+                    return;
+                  }
+                  // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
+                  final int newStartMin =
+                      rxHoraInicio.value!.hour * 60 +
+                      rxHoraInicio.value!.minute;
+                  final int newEndMin =
+                      rxHoraFinal.value!.hour * 60 + rxHoraFinal.value!.minute;
+                  if (newStartMin > newEndMin) {
+                    rxMensajeError.value =
+                        'La hora de finalización ha de ser posterior a la de inicio';
+                    return;
+                  }
+
+                  final fechaYHoraInicio = DateTime(
+                    turno.start.year,
+                    turno.start.month,
+                    turno.start.day,
+                    rxHoraInicio.value!.hour,
+                    rxHoraInicio.value!.minute,
+                  );
+                  final fechaYHoraFinal = DateTime(
+                    turno.start.year,
+                    turno.start.month,
+                    turno.start.day,
+                    rxHoraFinal.value!.hour,
+                    rxHoraFinal.value!.minute,
+                  );
+                  Turno turnoEditado = Turno(
+                    id: '',
+                    pool: pool,
+                    start: fechaYHoraInicio,
+                    end: fechaYHoraFinal,
+                  );
+                  socorristasCtrl.loading.value = true;
+                  //En caso de no cambiar el socorrista, se actualiza simplemente su turno:
+                  if (nombreSocorrista ==
+                      socorristasCtrl.socorristaSeleccionado.value!.nombre) {
+                    final String? resp = await socorristasCtrl
+                        .actualizarTurnoDeSocorrista(
+                          socorristaSeleccionado.value!.id!,
+                          turno.id,
+                          turnoEditado,
+                        );
+                    socorristasCtrl.loading.value = false;
+                    Get.back();
+                    Get.back();
+                    if (resp == null) {
+                      Get.snackbar(
+                        'Turno editado',
+                        'Editado turno de $nombreSocorrista - ${turnoEditado.fechaYHoraDetallada()}',
+                        backgroundColor: Colors.white,
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        resp,
+                        colorText: Colors.white,
+                        backgroundColor: const Color.fromARGB(193, 244, 67, 54),
+                      );
+                    }
+                  }
+                  //En caso de que cambie de socorrista, hay que eliminar el turno del socorrista inicial y agregar un nuevo turno al otro socorrista
+                  else {
+                    final String? respEliminar = await socorristasCtrl
+                        .eliminarTurnoDeSocorrista(
+                          socorristasCtrl.getIdByNombre(nombreSocorrista)!,
+                          turno.id,
+                        );
+                    final String? respAnyadir = await socorristasCtrl
+                        .asignarHorarioEnPiscina(
+                          turnoEditado,
+                          socorristaSeleccionado.value!,
+                        );
+                    Get.back();
+                    Get.back();
+                    socorristasCtrl.loading.value = false;
+                    if (respEliminar == null && respAnyadir == null) {
+                      Get.snackbar(
+                        'Turno editado',
+                        'añadido turno a ${socorristaSeleccionado.value!.nombre} - ${turnoEditado.fechaYHoraDetallada()}',
+                        backgroundColor: Colors.white,
+                      );
+                    } else if (respEliminar != null) {
+                      Get.snackbar(
+                        'Error',
+                        respEliminar,
+                        colorText: Colors.white,
+                        backgroundColor: const Color.fromARGB(193, 244, 67, 54),
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        respAnyadir!,
+                        colorText: Colors.white,
+                        backgroundColor: const Color.fromARGB(193, 244, 67, 54),
+                      );
+                    }
+                  }
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
+                ),
+                child: Obx(() {
+                  return socorristasCtrl.loading.value
+                      ? Center(child: CircularProgressIndicator())
+                      : Text(
+                          'Guardar horario editado',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                }),
+              ),
+              SizedBox(height: 8),
+              Obx(
+                () => rxMensajeError.value != ''
+                    ? Text(
+                        rxMensajeError.value,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

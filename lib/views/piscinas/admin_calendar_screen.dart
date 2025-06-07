@@ -84,7 +84,8 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
     Pool pool,
     DateTime fechaDia,
   ) {
-    final _formKey = GlobalKey<FormState>();
+    final AuxMethods auxMethods = AuxMethods();
+    final formKey = GlobalKey<FormState>();
 
     final SocorristasController socorristasCtrl =
         Get.find<SocorristasController>();
@@ -136,7 +137,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                 ),
                 SizedBox(height: 10),
                 Form(
-                  key: _formKey,
+                  key: formKey,
                   child: DropdownButtonFormField<Usuario>(
                     decoration: InputDecoration(
                       labelText: 'Socorrista',
@@ -181,7 +182,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              horaInicio.value = await pickHoraInicio(context);
+                              horaInicio.value = await auxMethods.pickHoraInicio(context);
                             },
                             child: Text('Hora inicial'),
                           ),
@@ -202,7 +203,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              horaFinal.value = await pickHoraFinalizacion(
+                              horaFinal.value = await auxMethods.pickHoraFinalizacion(
                                 context,
                               );
                             },
@@ -226,14 +227,13 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
-                    if (!_formKey.currentState!.validate()) {
+                    if (!formKey.currentState!.validate()) {
                       // Si el dropdown no está seleccionado, no continua
                       return;
                     }
                     if (horaInicio.value == null || horaFinal.value == null) {
                       mensajeError.value =
                           'Escoja la hora de inicio y finalización';
-                      print(mensajeError);
                       return;
                     }
                     // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
@@ -244,7 +244,6 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                     if (newStartMin > newEndMin) {
                       mensajeError.value =
                           'La hora de finalización ha de ser posterior a la de inicio';
-                      print(mensajeError);
                       return;
                     }
 
@@ -268,7 +267,6 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                       start: fechaYHoraInicio,
                       end: fechaYHoraFinal,
                     );
-                    print(nuevoTurno);
                     socorristasCtrl.loading.value = true;
                     final String? resp = await socorristasCtrl
                         .asignarHorarioEnPiscina(
@@ -340,39 +338,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
     );
   }
 
-  Future<TimeOfDay?> pickHoraInicio(BuildContext ctx) async {
-    final TimeOfDay inicial = TimeOfDay(hour: 8, minute: 0);
-
-    final TimeOfDay? picked = await showTimePicker(
-      context: ctx,
-      initialTime: inicial,
-      builder: (context, child) {
-        return Localizations.override(
-          context: context,
-          locale: const Locale('es', ''),
-          child: child,
-        );
-      },
-    );
-    return picked;
-  }
-
-  Future<TimeOfDay?> pickHoraFinalizacion(BuildContext ctx) async {
-    final TimeOfDay finalizacion = TimeOfDay(hour: 20, minute: 0);
-
-    final TimeOfDay? picked = await showTimePicker(
-      context: ctx,
-      initialTime: finalizacion,
-      builder: (context, child) {
-        return Localizations.override(
-          context: context,
-          locale: const Locale('es', ''),
-          child: child,
-        );
-      },
-    );
-    return picked;
-  }
+  
 
   Map<String, List<Turno>> mostrarTurnosDelDia(
     DateTime dia,
@@ -726,6 +692,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                                                   turno: listaDeTurnos[i],
                                                   nombreSocorrista:
                                                       nombreSocorrista,
+                                                  pool: widget.pool,
                                                 ),
                                               );
                                               setState(() {

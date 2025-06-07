@@ -41,6 +41,40 @@ class AuxMethods {
     if (mes < 1 || mes > 12) return '';
     return meses[mes - 1];
   }
+
+  Future<TimeOfDay?> pickHoraInicio(BuildContext ctx) async {
+    final TimeOfDay inicial = TimeOfDay(hour: 8, minute: 0);
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: ctx,
+      initialTime: inicial,
+      builder: (context, child) {
+        return Localizations.override(
+          context: context,
+          locale: const Locale('es', ''),
+          child: child,
+        );
+      },
+    );
+    return picked;
+  }
+
+  Future<TimeOfDay?> pickHoraFinalizacion(BuildContext ctx) async {
+    final TimeOfDay finalizacion = TimeOfDay(hour: 20, minute: 0);
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: ctx,
+      initialTime: finalizacion,
+      builder: (context, child) {
+        return Localizations.override(
+          context: context,
+          locale: const Locale('es', ''),
+          child: child,
+        );
+      },
+    );
+    return picked;
+  }
 }
 
 class DashedDivider extends StatelessWidget {

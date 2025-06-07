@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gestiona_app/models/pool.dart';
 import 'package:gestiona_app/models/turno.dart';
 import 'package:gestiona_app/utils/aux_methods.dart';
+import 'package:gestiona_app/widgets/admin/turnos/editar_turno.dart';
 import 'package:gestiona_app/widgets/admin/turnos/eliminar_turno.dart';
 import 'package:get/get.dart';
 
 class EditarOEliminarTurno extends StatelessWidget {
   final Turno turno;
   final String nombreSocorrista;
+  final Pool pool;
 
   const EditarOEliminarTurno({
     super.key,
     required this.turno,
-    required this.nombreSocorrista,
+    required this.nombreSocorrista, required this.pool,
   });
 
   @override
@@ -41,7 +44,7 @@ class EditarOEliminarTurno extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            
+
             children: [
               Text(
                 'Gestionar turno',
@@ -53,7 +56,9 @@ class EditarOEliminarTurno extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Turno perteneciente a: ${auxMethods.capitalize(nombreSocorrista)}'),
+                    Text(
+                      'Turno perteneciente a: ${auxMethods.capitalize(nombreSocorrista)}',
+                    ),
                     Text('Piscina: ${turno.pool.nombre}'),
                     Text('Fecha y hora: ${turno.fechaYHoraDetallada()}'),
                   ],
@@ -66,10 +71,17 @@ class EditarOEliminarTurno extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      await Get.dialog(EliminarTurno(turno: turno, nombreSocorrista: nombreSocorrista));
+                      await Get.dialog(
+                        EliminarTurno(
+                          turno: turno,
+                          nombreSocorrista: nombreSocorrista,
+                        ),
+                      );
                     },
                     style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(const Color.fromARGB(176, 244, 67, 54)),
+                      backgroundColor: WidgetStatePropertyAll(
+                        const Color.fromARGB(176, 244, 67, 54),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -79,14 +91,25 @@ class EditarOEliminarTurno extends StatelessWidget {
                         ),
                         Text(
                           ' Eliminar',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(width: 20),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Get.dialog(
+                        EditarTurno(
+                          turno: turno,
+                          nombreSocorrista: nombreSocorrista,
+                          pool: pool,
+                        ),
+                      );
+                    },
                     style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(
                         const Color.fromARGB(255, 255, 255, 255),
@@ -94,8 +117,17 @@ class EditarOEliminarTurno extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        FaIcon(FontAwesomeIcons.penToSquare, color: Colors.black,),
-                        Text(' Editar', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),
+                        FaIcon(
+                          FontAwesomeIcons.penToSquare,
+                          color: Colors.black,
+                        ),
+                        Text(
+                          ' Editar',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),

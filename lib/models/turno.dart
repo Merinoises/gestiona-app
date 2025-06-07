@@ -29,7 +29,7 @@ class Turno {
     final mFin = end.minute.toString().padLeft(2, '0');
     final hTot = duracion.inHours;
     final mTot = duracion.inMinutes.remainder(60);
-    return '[$id] ${pool.nombre}: $hIni:$mIni – $hFin:$mFin ($hTot h $mTot m)';
+    return '[$id] ${pool.nombre}: $hIni:$mIni - $hFin:$mFin ($hTot h $mTot m)';
   }
 
   String stringSoloHoras() {

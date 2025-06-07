@@ -38,6 +38,14 @@ class SocorristasController extends GetxController {
     return usuario?.id;
   }
 
+  Usuario? getSocorristaByNombre(String nombreBuscado) {
+    // Buscar por nombre sin distinguir mayúsculas/minúsculas
+    final usuario = socorristas.firstWhereOrNull(
+      (u) => u.nombre.toLowerCase() == nombreBuscado.toLowerCase(),
+    );
+    return usuario;
+  }
+
   /// Obtiene todos los usuarios cuyo campo isAdmin == false
   Future<void> loadSocorristas() async {
     try {
@@ -219,4 +227,48 @@ class SocorristasController extends GetxController {
       return 'Error de red: $e';
     }
   }
+
+  /// Actualiza un turno concreto de un socorrista en el backend,
+/// usando su userId y el turnoId, y actualiza el listado local.
+/// Retorna null si todo va bien, o un mensaje de error.
+Future<String?> actualizarTurnoDeSocorrista(
+    String userId,
+    String turnoId,
+    Turno turno,
+  ) async {
+  try {
+    // 1) Llamamos al endpoint PUT /socorrista/:userId/turnos/:turnoId
+    final body = turno.toJson();
+    final resp = await _http.put(
+      '/socorrista/$userId/turnos/$turnoId',
+      jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    // 2) Si todo OK, el backend devuelve el usuario actualizado
+    if (resp.statusCode == 200 && resp.body != null) {
+      final poolCtrl = Get.find<PoolController>();
+      final socorristaActualizado = Usuario.fromJson(
+        resp.body as Map<String, dynamic>,
+        poolCtrl.pools,
+      );
+
+      // 3) Reemplazamos en nuestro listado de socorristas
+      final idx = socorristas.indexWhere((u) => u.id == userId);
+      if (idx >= 0) {
+        socorristas[idx] = socorristaActualizado;
+      }
+      return null;
+    } else {
+      // 4) Si hay error, extraemos mensaje
+      final msg = (resp.body != null && resp.body is Map)
+          ? (resp.body as Map)['msg'] ?? 'Error ${resp.statusCode}'
+          : 'Error ${resp.statusCode}';
+      return msg.toString();
+    }
+  } catch (e) {
+    return 'Error de red: $e';
+  }
+}
+
 }
