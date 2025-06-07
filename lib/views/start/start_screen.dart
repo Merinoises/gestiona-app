@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/global/environment.dart';
 import 'package:gestiona_app/models/usuario.dart';
 import 'package:gestiona_app/services/auth_service.dart';
@@ -18,7 +19,10 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthService authService = Get.find<AuthService>();
+    final SocorristasController socorristasController = Get.find<SocorristasController>();
     final Usuario usuario = authService.usuario.value!;
+    
+
     final bool isAdmin = usuario.isAdmin;
 
     return Scaffold(
@@ -90,7 +94,8 @@ class StartScreen extends StatelessWidget {
                     if (isAdmin) {
                       Get.to(() => AdminSocorristasScreen());
                     } else {
-                      Get.to(() => InfoSocorristaScreen(socorrista: usuario));
+                      socorristasController.socorristaSeleccionado.value = usuario;
+                      Get.to(() => InfoSocorristaScreen());
                     }
                   },
                 ),

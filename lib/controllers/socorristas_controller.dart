@@ -119,7 +119,10 @@ class SocorristasController extends GetxController {
           poolCtrl.pools,
         );
         final idx = socorristas.indexWhere((u) => u.id == actualizado.id);
-        if (idx >= 0) socorristas[idx] = actualizado;
+        if (idx >= 0) {
+          socorristas[idx] = actualizado;
+          socorristas.refresh();
+        }
         return null;
       } else {
         final msg = (resp.body != null && resp.body is Map)
@@ -141,6 +144,7 @@ class SocorristasController extends GetxController {
       );
       if (resp.statusCode == 200) {
         socorristas.removeWhere((u) => u.id == id);
+        socorristas.refresh();
         return null;
       } else {
         final msg = (resp.body != null && resp.body is Map)
@@ -175,6 +179,7 @@ class SocorristasController extends GetxController {
         );
         if (index >= 0) {
           socorristas[index] = socorristaActualizado;
+          socorristas.refresh();
         }
         return null;
       } else {
@@ -213,7 +218,13 @@ class SocorristasController extends GetxController {
         // 3) Reemplazamos en nuestro listado de socorristas
         final idx = socorristas.indexWhere((u) => u.id == userId);
         if (idx >= 0) {
-          socorristas[idx] = socorristaActualizado;
+          final actualizado = socorristaActualizado;
+          socorristas[idx] = actualizado;
+          socorristas.refresh();
+
+          if (socorristaSeleccionado.value?.id == userId) {
+            socorristaSeleccionado.value = actualizado;
+          }
         }
         return null;
       } else {
@@ -229,46 +240,50 @@ class SocorristasController extends GetxController {
   }
 
   /// Actualiza un turno concreto de un socorrista en el backend,
-/// usando su userId y el turnoId, y actualiza el listado local.
-/// Retorna null si todo va bien, o un mensaje de error.
-Future<String?> actualizarTurnoDeSocorrista(
+  /// usando su userId y el turnoId, y actualiza el listado local.
+  /// Retorna null si todo va bien, o un mensaje de error.
+  Future<String?> actualizarTurnoDeSocorrista(
     String userId,
     String turnoId,
     Turno turno,
   ) async {
-  try {
-    // 1) Llamamos al endpoint PUT /socorrista/:userId/turnos/:turnoId
-    final body = turno.toJson();
-    final resp = await _http.put(
-      '/socorrista/$userId/turnos/$turnoId',
-      jsonEncode(body),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    // 2) Si todo OK, el backend devuelve el usuario actualizado
-    if (resp.statusCode == 200 && resp.body != null) {
-      final poolCtrl = Get.find<PoolController>();
-      final socorristaActualizado = Usuario.fromJson(
-        resp.body as Map<String, dynamic>,
-        poolCtrl.pools,
+    try {
+      // 1) Llamamos al endpoint PUT /socorrista/:userId/turnos/:turnoId
+      final body = turno.toJson();
+      final resp = await _http.put(
+        '/socorrista/$userId/turnos/$turnoId',
+        jsonEncode(body),
+        headers: {'Content-Type': 'application/json'},
       );
 
-      // 3) Reemplazamos en nuestro listado de socorristas
-      final idx = socorristas.indexWhere((u) => u.id == userId);
-      if (idx >= 0) {
-        socorristas[idx] = socorristaActualizado;
-      }
-      return null;
-    } else {
-      // 4) Si hay error, extraemos mensaje
-      final msg = (resp.body != null && resp.body is Map)
-          ? (resp.body as Map)['msg'] ?? 'Error ${resp.statusCode}'
-          : 'Error ${resp.statusCode}';
-      return msg.toString();
-    }
-  } catch (e) {
-    return 'Error de red: $e';
-  }
-}
+      // 2) Si todo OK, el backend devuelve el usuario actualizado
+      if (resp.statusCode == 200 && resp.body != null) {
+        final poolCtrl = Get.find<PoolController>();
+        final socorristaActualizado = Usuario.fromJson(
+          resp.body as Map<String, dynamic>,
+          poolCtrl.pools,
+        );
 
+        // 3) Reemplazamos en nuestro listado de socorristas
+        final idx = socorristas.indexWhere((u) => u.id == userId);
+        if (idx >= 0) {
+          final actualizado = socorristaActualizado;
+          socorristas[idx] = socorristaActualizado;
+          socorristas.refresh();
+          if (socorristaSeleccionado.value?.id == userId) {
+            socorristaSeleccionado.value = actualizado;
+          }
+        }
+        return null;
+      } else {
+        // 4) Si hay error, extraemos mensaje
+        final msg = (resp.body != null && resp.body is Map)
+            ? (resp.body as Map)['msg'] ?? 'Error ${resp.statusCode}'
+            : 'Error ${resp.statusCode}';
+        return msg.toString();
+      }
+    } catch (e) {
+      return 'Error de red: $e';
+    }
+  }
 }
