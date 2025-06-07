@@ -30,6 +30,14 @@ class SocorristasController extends GetxController {
     loadSocorristas();
   }
 
+  String? getIdByNombre(String nombreBuscado) {
+    // Buscar por nombre sin distinguir mayúsculas/minúsculas
+    final usuario = socorristas.firstWhereOrNull(
+      (u) => u.nombre.toLowerCase() == nombreBuscado.toLowerCase(),
+    );
+    return usuario?.id;
+  }
+
   /// Obtiene todos los usuarios cuyo campo isAdmin == false
   Future<void> loadSocorristas() async {
     try {
@@ -162,6 +170,46 @@ class SocorristasController extends GetxController {
         }
         return null;
       } else {
+        final msg = (resp.body != null && resp.body is Map)
+            ? (resp.body as Map)['msg'] ?? 'Error ${resp.statusCode}'
+            : 'Error ${resp.statusCode}';
+        return msg.toString();
+      }
+    } catch (e) {
+      return 'Error de red: $e';
+    }
+  }
+
+  /// Elimina un turno concreto de un socorrista en el backend,
+  /// usando su userId y el turnoId, y actualiza el listado local.
+  /// Retorna null si todo va bien, o un mensaje de error.
+  Future<String?> eliminarTurnoDeSocorrista(
+    String userId,
+    String turnoId,
+  ) async {
+    try {
+      // 1) Llamamos al endpoint DELETE /socorrista/:userId/turnos/:turnoId
+      final resp = await _http.delete(
+        '/socorrista/$userId/turnos/$turnoId',
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      // 2) Si todo OK, el backend nos devuelve el usuario actualizado:
+      if (resp.statusCode == 200 && resp.body != null) {
+        final poolCtrl = Get.find<PoolController>();
+        final socorristaActualizado = Usuario.fromJson(
+          resp.body as Map<String, dynamic>,
+          poolCtrl.pools,
+        );
+
+        // 3) Reemplazamos en nuestro listado de socorristas
+        final idx = socorristas.indexWhere((u) => u.id == userId);
+        if (idx >= 0) {
+          socorristas[idx] = socorristaActualizado;
+        }
+        return null;
+      } else {
+        // 4) Si hay error, extraemos mensaje
         final msg = (resp.body != null && resp.body is Map)
             ? (resp.body as Map)['msg'] ?? 'Error ${resp.statusCode}'
             : 'Error ${resp.statusCode}';

@@ -4,6 +4,7 @@ import 'package:gestiona_app/models/pool.dart';
 import 'package:gestiona_app/models/turno.dart';
 import 'package:gestiona_app/models/usuario.dart';
 import 'package:gestiona_app/utils/aux_methods.dart';
+import 'package:gestiona_app/widgets/admin/turnos/editar_o_eliminar_turno.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -441,7 +442,6 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
           'Calendario ${widget.pool.nombre}',
           style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
         ),
-        
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -719,9 +719,23 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                                           physics:
                                               const NeverScrollableScrollPhysics(),
                                           itemCount: listaDeTurnos.length,
-                                          itemBuilder: (ctx, i) => Text(
-                                            '\t\t${listaDeTurnos[i].stringSoloHoras()}',
-                                            style: TextStyle(fontSize: 13),
+                                          itemBuilder: (ctx, i) => GestureDetector(
+                                            onTap: () async {
+                                              await Get.dialog(
+                                                EditarOEliminarTurno(
+                                                  turno: listaDeTurnos[i],
+                                                  nombreSocorrista:
+                                                      nombreSocorrista,
+                                                ),
+                                              );
+                                              setState(() {
+                                                return;
+                                              });
+                                            },
+                                            child: Text(
+                                              '\t\t${listaDeTurnos[i].stringSoloHoras()}',
+                                              style: TextStyle(fontSize: 13),
+                                            ),
                                           ),
                                         ),
                                       ),
