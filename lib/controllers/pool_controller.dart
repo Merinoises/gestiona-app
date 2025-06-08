@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:get/get.dart';
 import 'package:gestiona_app/global/environment.dart';
 import 'package:gestiona_app/models/pool.dart';
@@ -127,6 +128,7 @@ class PoolController extends GetxController {
       if (resp.statusCode == 200) {
         // Remover de la lista local
         pools.removeWhere((p) => p.id == id);
+        await Get.find<SocorristasController>().loadSocorristas();
         return null;
       } else {
         final msg = (resp.body != null && resp.body is Map)

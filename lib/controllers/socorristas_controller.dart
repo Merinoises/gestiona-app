@@ -30,6 +30,12 @@ class SocorristasController extends GetxController {
     loadSocorristas();
   }
 
+  bool isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  String _fmtHora(DateTime dt) =>
+      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+
   String? getIdByNombre(String nombreBuscado) {
     // Buscar por nombre sin distinguir mayúsculas/minúsculas
     final usuario = socorristas.firstWhereOrNull(
@@ -158,11 +164,26 @@ class SocorristasController extends GetxController {
   }
 
   Future<String?> asignarHorarioEnPiscina(
-    Turno turno,
+    Turno nuevoTurno,
     Usuario socorrista,
   ) async {
+    // 0) Comprueba solapamientos con cualquier turno existente
+    for (final turnoExistente in socorrista.turnos) {
+      // sólo nos importan los turnos del mismo día
+      if (isSameDay(turnoExistente.start, nuevoTurno.start)) {
+        final inicioN = nuevoTurno.start;
+        final finN = nuevoTurno.end;
+        final inicioE = turnoExistente.start;
+        final finE = turnoExistente.end;
+        // se solapan si: inicioN < finE && inicioE < finN
+        if (inicioN.isBefore(finE) && inicioE.isBefore(finN)) {
+          return '❌ El socorrista ya tiene un turno en ${turnoExistente.pool.nombre} '
+              'de ${_fmtHora(inicioE)} a ${_fmtHora(finE)}';
+        }
+      }
+    }
     try {
-      final body = turno.toJson();
+      final body = nuevoTurno.toJson();
       final resp = await _http.put(
         '/socorrista/establecer-turno/${socorrista.id}',
         jsonEncode(body),
@@ -245,11 +266,24 @@ class SocorristasController extends GetxController {
   Future<String?> actualizarTurnoDeSocorrista(
     String userId,
     String turnoId,
-    Turno turno,
+    Turno nuevoTurno,
   ) async {
+    final socorrista = socorristas.firstWhere((u) => u.id == userId);
+    for (final tExist in socorrista.turnos) {
+      if (tExist.id == turnoId) continue; // ignoramos el que estamos editando
+      if (isSameDay(tExist.start, nuevoTurno.start)) {
+        final iN = nuevoTurno.start, fN = nuevoTurno.end;
+        final iE = tExist.start, fE = tExist.end;
+        if (iN.isBefore(fE) && iE.isBefore(fN)) {
+          return '❌ Este cambio chocaría con el turno de '
+              '${tExist.pool.nombre} de ${_fmtHora(iE)} a ${_fmtHora(fE)}';
+        }
+      }
+    }
+
     try {
       // 1) Llamamos al endpoint PUT /socorrista/:userId/turnos/:turnoId
-      final body = turno.toJson();
+      final body = nuevoTurno.toJson();
       final resp = await _http.put(
         '/socorrista/$userId/turnos/$turnoId',
         jsonEncode(body),

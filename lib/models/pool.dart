@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// Representa un intervalo horario (hours:minutes) dentro de un mismo día.
 /// Ejemplo: 08:00–20:00.
@@ -165,13 +166,20 @@ class SpecialSchedule {
   ///   "timeRange": { "startHour": 10, "startMinute": 0, "endHour": 16, "endMinute": 0 }
   /// }
   Map<String, dynamic> toJson() {
-    return {'date': date.toIso8601String(), 'timeRange': timeRange.toJson()};
+    return {
+      'date': DateFormat('yyyy-MM-dd').format(date),
+      'timeRange': timeRange.toJson(),
+    };
   }
 
   factory SpecialSchedule.fromJson(Map<String, dynamic> json) {
+    // parseamos sólo la parte fecha, luego normalizamos a medianoche LOCAL
+    final raw = json['date'] as String;               // e.g. "2025-06-18"
+    final d = DateTime.parse(raw);                    // 2025-06-18 00:00:00.000 (local)
+    final localDate = DateTime(d.year, d.month, d.day);
     return SpecialSchedule(
-      date: DateTime.parse(json['date'] as String),
-      timeRange: TimeRange.fromJson(json['timeRange'] as Map<String, dynamic>),
+      date: localDate,
+      timeRange: TimeRange.fromJson(json['timeRange']),
     );
   }
 }

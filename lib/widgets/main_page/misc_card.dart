@@ -19,13 +19,12 @@ class MiscelaneaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool _isLoading = false;
 
     return Expanded(
       child: Stack(
         children: [
           Opacity(
-            opacity: _isLoading ? 0.5 : 1.0,
+            opacity: 1.0,
             child: InkWell(
               onTap: onPressed,
               child: Stack(
@@ -107,12 +106,6 @@ class MiscelaneaCard extends StatelessWidget {
               ),
             ),
           ),
-          // if (_isLoading)
-          //   const Positioned.fill(
-          //     child: Center(
-          //       child: CircularProgressIndicator(color: Colors.amber),
-          //     ),
-          //   ),
         ],
       ),
     );
