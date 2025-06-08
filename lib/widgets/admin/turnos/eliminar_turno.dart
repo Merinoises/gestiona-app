@@ -33,7 +33,7 @@ class EliminarTurno extends StatelessWidget {
             end: Alignment.bottomRight, // Punto final del degradado
             colors: [
               Color.fromARGB(255, 255, 255, 255), // Color inicial
-              Color.fromARGB(255, 191, 237, 255), // Color final
+              Color.fromARGB(255, 255, 191, 191), // Color final
             ],
           ),
         ),

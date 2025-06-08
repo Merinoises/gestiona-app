@@ -265,7 +265,7 @@ class Pool {
       nombre: json['nombre'] as String,
       ubicacion: json['ubicacion'] as String,
       fechaApertura: json['fechaApertura'] != null
-          ? DateTime.parse(json['fechaApertura'] as String)
+          ? DateTime.parse(json['fechaApertura'] as String).toLocal()
           : null,
       weeklySchedules: (json['weeklySchedules'] as List<dynamic>? ?? [])
           .map((w) => WeeklySchedule.fromJson(w as Map<String, dynamic>))

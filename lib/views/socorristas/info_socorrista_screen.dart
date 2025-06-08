@@ -22,25 +22,26 @@ class _InfoSocorristaScreenState extends State<InfoSocorristaScreen> {
     final SocorristasController socorristasCtrl =
         Get.find<SocorristasController>();
 
-    Usuario socorrista = socorristasCtrl.socorristaSeleccionado.value!;
-
-    final Set<Pool> poolsDelSocorrista = socorrista.turnos
-        .map((turno) => turno.pool)
-        .toSet();
-
-    final ahora = DateTime.now();
-    final futuros =
-        socorrista.turnos.where((t) => !t.start.isBefore(ahora)).toList()
-          ..sort((a, b) => a.start.compareTo(b.start));
-    final proximosTres = futuros.length <= 3 ? futuros : futuros.sublist(0, 3);
-
-    final int anyo = ahora.year;
-    final List<int> meses = [6, 7, 8, 9];
-
-    final double importeTotal = socorrista.importeTotalTurnos();
-    final String importeTotalStr = '${importeTotal.toStringAsFixed(2)} €';
-
     return Obx(() {
+      Usuario socorrista = socorristasCtrl.socorristaSeleccionado.value!;
+
+      final Set<Pool> poolsDelSocorrista = socorrista.turnos
+          .map((turno) => turno.pool)
+          .toSet();
+
+      final ahora = DateTime.now();
+      final futuros =
+          socorrista.turnos.where((t) => !t.start.isBefore(ahora)).toList()
+            ..sort((a, b) => a.start.compareTo(b.start));
+      final proximosTres = futuros.length <= 3
+          ? futuros
+          : futuros.sublist(0, 3);
+
+      final int anyo = ahora.year;
+      final List<int> meses = [6, 7, 8, 9];
+
+      final double importeTotal = socorrista.importeTotalTurnos();
+      final String importeTotalStr = '${importeTotal.toStringAsFixed(2)} €';
       return Scaffold(
         appBar: AppBar(
           title: Text(

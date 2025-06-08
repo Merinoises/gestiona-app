@@ -513,7 +513,7 @@ class AddPoolController extends GetxController {
     horaInicio.value = null;
     horaFinal.value = null;
     // Vuelve a una lista de 7 falsos
-    selectedDays.assignAll(List<bool>.filled(7, false));
+    selectedDays = List<bool>.filled(7, false, growable: true);
     listaHorarios.clear();
     mensajeError.value = '';
   }

@@ -34,43 +34,44 @@ class AdminSocorristasScreen extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: ListView.builder(
-            itemCount: socorristasCtrl.socorristas.length,
-            itemBuilder: (context, index) {
-              final socorrista = socorristasCtrl.socorristas[index];
+          child: Obx(
+            () => ListView.builder(
+              itemCount: socorristasCtrl.socorristas.length,
+              itemBuilder: (context, index) {
+                final socorrista = socorristasCtrl.socorristas[index];
 
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Material(
-                  color: Colors.transparent,
-                  child: ListTile(
-                    leading: InitialsCircle(text: socorrista.nombre),
-                    title: Text(
-                      auxMethods.capitalize(socorrista.nombre),
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    trailing: IconButton(
-                      onPressed: () {
-                        socorristasCtrl.socorristaSeleccionado.value = socorrista;
-                        Get.to(
-                          () => InfoSocorristaScreen(),
-                        );
-                      },
-                      icon: FaIcon(FontAwesomeIcons.eye),
-                    ),
-                    tileColor: const Color.fromARGB(255, 255, 206, 221),
-                    iconColor: const Color.fromARGB(136, 5, 96, 170),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: const Color.fromARGB(104, 0, 0, 0),
-                        width: 2,
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: InitialsCircle(text: socorrista.nombre),
+                      title: Text(
+                        auxMethods.capitalize(socorrista.nombre),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {
+                          socorristasCtrl.socorristaSeleccionado.value =
+                              socorrista;
+                          Get.to(() => InfoSocorristaScreen());
+                        },
+                        icon: FaIcon(FontAwesomeIcons.eye),
+                      ),
+                      tileColor: const Color.fromARGB(255, 255, 206, 221),
+                      iconColor: const Color.fromARGB(136, 5, 96, 170),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: const Color.fromARGB(104, 0, 0, 0),
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -7,6 +7,7 @@ import 'package:gestiona_app/views/anadir/add_pool_screen.dart';
 import 'package:gestiona_app/views/anadir/add_socorrista_screen.dart';
 import 'package:gestiona_app/views/login/loading.dart';
 import 'package:gestiona_app/views/piscinas/admin_piscinas_screen.dart';
+import 'package:gestiona_app/views/piscinas/soco_piscinas_screen.dart';
 import 'package:gestiona_app/views/socorristas/admin_socorristas_screen.dart';
 import 'package:gestiona_app/views/socorristas/info_socorrista_screen.dart';
 import 'package:gestiona_app/widgets/main_page/card_seleccion.dart';
@@ -19,9 +20,9 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthService authService = Get.find<AuthService>();
-    final SocorristasController socorristasController = Get.find<SocorristasController>();
+    final SocorristasController socorristasController =
+        Get.find<SocorristasController>();
     final Usuario usuario = authService.usuario.value!;
-    
 
     final bool isAdmin = usuario.isAdmin;
 
@@ -77,7 +78,9 @@ class StartScreen extends StatelessWidget {
                   alturaCard: MediaQuery.of(context).size.height * (1 / 6),
                   anchuraCard: MediaQuery.of(context).size.height * 0.8,
                   onPressed: () {
-                    Get.to(() => AdminPiscinasScreen());
+                    isAdmin
+                        ? Get.to(() => AdminPiscinasScreen())
+                        : Get.to(() => SocoPiscinasScreen());
                   },
                 ),
                 // SizedBox(height: 20,),
@@ -94,7 +97,8 @@ class StartScreen extends StatelessWidget {
                     if (isAdmin) {
                       Get.to(() => AdminSocorristasScreen());
                     } else {
-                      socorristasController.socorristaSeleccionado.value = usuario;
+                      socorristasController.socorristaSeleccionado.value =
+                          usuario;
                       Get.to(() => InfoSocorristaScreen());
                     }
                   },
@@ -127,6 +131,14 @@ class StartScreen extends StatelessWidget {
           ),
         ),
       ),
+      floatingActionButton: isAdmin
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                Get.offAll(() => LoadingScreen());
+              },
+              child: Icon(Icons.refresh_outlined),
+            ),
     );
   }
 }
