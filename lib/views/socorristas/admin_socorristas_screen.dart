@@ -54,7 +54,9 @@ class AdminSocorristasScreen extends StatelessWidget {
                         onPressed: () {
                           socorristasCtrl.socorristaSeleccionado.value =
                               socorrista;
-                          Get.to(() => InfoSocorristaScreen());
+                          Get.to(
+                            () => InfoSocorristaScreen(),
+                          );
                         },
                         icon: FaIcon(FontAwesomeIcons.eye),
                       ),

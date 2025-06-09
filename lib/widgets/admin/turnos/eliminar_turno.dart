@@ -76,86 +76,88 @@ class EliminarTurno extends StatelessWidget {
                         const Color.fromARGB(255, 255, 255, 255),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.penToSquare,
-                          color: Colors.black,
-                        ),
-                        Text(
-                          ' Volver',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      ' Volver',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final idSocorrista = socorristasCtrl.getIdByNombre(
-                        nombreSocorrista,
-                      );
-                      if (idSocorrista == null) {
-                        Get.back();
-                        Get.back();
-                        Get.snackbar(
-                          'Error',
-                          'Socorrista no encontrado',
-                          colorText: Colors.white,
-                          backgroundColor: const Color.fromARGB(
-                            200,
-                            244,
-                            67,
-                            54,
-                          ),
-                        );
-                      }
-                      String? resp = await socorristasCtrl
-                          .eliminarTurnoDeSocorrista(idSocorrista!, turno.id);
-                      Get.back();
-                      Get.back();
-                      if (resp == null) {
-                        Get.snackbar(
-                          'Turno eliminado',
-                          'Eliminado turno de $nombreSocorrista - ${turno.fechaYHoraDetallada()}',
-                          backgroundColor: Colors.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'Socorrista no encontrado',
-                          colorText: Colors.white,
-                          backgroundColor: const Color.fromARGB(
-                            193,
-                            244,
-                            67,
-                            54,
-                          ),
-                        );
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        const Color.fromARGB(176, 244, 67, 54),
+                  Obx(
+                    () => ElevatedButton(
+                      onPressed: socorristasCtrl.loading.value
+                          ? null
+                          : () async {
+                              final idSocorrista = socorristasCtrl
+                                  .getIdByNombre(nombreSocorrista);
+                              if (idSocorrista == null) {
+                                Get.back();
+                                Get.back();
+                                Get.snackbar(
+                                  'Error',
+                                  'Socorrista no encontrado',
+                                  colorText: Colors.white,
+                                  backgroundColor: const Color.fromARGB(
+                                    200,
+                                    244,
+                                    67,
+                                    54,
+                                  ),
+                                );
+                              }
+                              String? resp = await socorristasCtrl
+                                  .eliminarTurnoDeSocorrista(
+                                    idSocorrista!,
+                                    turno.id,
+                                  );
+                              Get.back();
+                              Get.back();
+                              if (resp == null) {
+                                Get.snackbar(
+                                  'Turno eliminado',
+                                  'Eliminado turno de $nombreSocorrista - ${turno.fechaYHoraDetallada()}',
+                                  backgroundColor: Colors.white,
+                                );
+                              } else {
+                                Get.snackbar(
+                                  'Error',
+                                  'Socorrista no encontrado',
+                                  colorText: Colors.white,
+                                  backgroundColor: const Color.fromARGB(
+                                    193,
+                                    244,
+                                    67,
+                                    54,
+                                  ),
+                                );
+                              }
+                            },
+                      style: ButtonStyle(
+                        backgroundColor: socorristasCtrl.loading.value
+                            ? null
+                            : WidgetStatePropertyAll(
+                                const Color.fromARGB(176, 244, 67, 54),
+                              ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.circleXmark,
-                          color: const Color.fromARGB(255, 255, 255, 255),
-                        ),
-                        Text(
-                          ' Eliminar',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                      child: Row(
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.circleXmark,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                           ),
-                        ),
-                      ],
+                          socorristasCtrl.loading.value
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  ' Eliminar',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

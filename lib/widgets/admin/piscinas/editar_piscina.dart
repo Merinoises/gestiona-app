@@ -161,7 +161,8 @@ class EditarPiscina extends StatelessWidget {
                     itemCount: addPoolCtrl.listaHorariosEspeciales.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      final texto = addPoolCtrl.listaHorariosEspeciales[index].toString();
+                      final texto = addPoolCtrl.listaHorariosEspeciales[index]
+                          .toString();
                       return ListTile(
                         title: Text('✨ $texto'),
                         trailing: IconButton(
@@ -175,7 +176,8 @@ class EditarPiscina extends StatelessWidget {
                   );
                 }),
                 GestureDetector(
-                  onTap: () => addPoolCtrl.mostrarSelectorHorarioEspecial(context),
+                  onTap: () =>
+                      addPoolCtrl.mostrarSelectorHorarioEspecial(context),
                   child: Row(
                     children: [
                       Icon(Icons.add_circle, color: Colors.lightBlue[300]),
@@ -185,26 +187,34 @@ class EditarPiscina extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      await addPoolCtrl.editarPiscina(pool.id!);
-                      addPoolCtrl.resetAll();
-                      Get.back();
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      const Color.fromARGB(255, 255, 184, 255),
+                Obx(
+                  () => ElevatedButton(
+                    onPressed: addPoolCtrl.loading.value
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              await addPoolCtrl.editarPiscina(pool.id!);
+                              addPoolCtrl.resetAll();
+                              Get.back();
+                            }
+                          },
+                    style: ButtonStyle(
+                      backgroundColor: addPoolCtrl.loading.value
+                          ? null
+                          : WidgetStatePropertyAll(
+                              const Color.fromARGB(255, 255, 184, 255),
+                            ),
                     ),
-                  ),
-                  child: Text(
-                    'Actualizar piscina',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                    child: addPoolCtrl.loading.value
+                        ? CircularProgressIndicator()
+                        : Text(
+                            'Actualizar piscina',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
                   ),
                 ),
               ],

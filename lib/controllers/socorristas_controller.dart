@@ -81,6 +81,7 @@ class SocorristasController extends GetxController {
   /// Si deseas dar de alta un nuevo socorrista:
   Future<String?> createSocorrista(Usuario nuevoSocorrista) async {
     try {
+      loading.value = true;
       final body = nuevoSocorrista.toJson()
         ..['isAdmin'] = false; // asegurar que sea socorrista
       final resp = await _http.post(
@@ -88,6 +89,7 @@ class SocorristasController extends GetxController {
         jsonEncode(body),
         headers: {'Content-Type': 'application/json'},
       );
+      loading.value = false;
       if (resp.statusCode == 200 && resp.body != null) {
         final poolCtrl = Get.find<PoolController>();
         final creado = Usuario.fromJson(
@@ -183,12 +185,14 @@ class SocorristasController extends GetxController {
       }
     }
     try {
+      loading.value = true;
       final body = nuevoTurno.toJson();
       final resp = await _http.put(
         '/socorrista/establecer-turno/${socorrista.id}',
         jsonEncode(body),
         headers: {'Content-Type': 'application/json'},
       );
+      loading.value = false;
       if (resp.statusCode == 200) {
         final poolCtrl = Get.find<PoolController>();
         final socorristaActualizado = Usuario.fromJson(
@@ -201,6 +205,9 @@ class SocorristasController extends GetxController {
         if (index >= 0) {
           socorristas[index] = socorristaActualizado;
           socorristas.refresh();
+          if (socorristaSeleccionado.value?.id == socorristaActualizado.id) {
+            socorristaSeleccionado.value = socorristaActualizado;
+          }
         }
         return null;
       } else {
@@ -222,12 +229,13 @@ class SocorristasController extends GetxController {
     String turnoId,
   ) async {
     try {
+      loading.value = true;
       // 1) Llamamos al endpoint DELETE /socorrista/:userId/turnos/:turnoId
       final resp = await _http.delete(
         '/socorrista/$userId/turnos/$turnoId',
         headers: {'Content-Type': 'application/json'},
       );
-
+      loading.value = false;
       // 2) Si todo OK, el backend nos devuelve el usuario actualizado:
       if (resp.statusCode == 200 && resp.body != null) {
         final poolCtrl = Get.find<PoolController>();

@@ -126,25 +126,31 @@ class AddPoolScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      await addPoolCtrl.guardarPiscina();
-                      addPoolCtrl.resetAll();
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      const Color.fromARGB(255, 255, 184, 255),
+                Obx(
+                  () => ElevatedButton(
+                    onPressed: addPoolCtrl.loading.value
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              await addPoolCtrl.guardarPiscina();
+                              addPoolCtrl.resetAll();
+                            }
+                          },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(
+                        const Color.fromARGB(255, 255, 184, 255),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'Guardar piscina',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+                    child: addPoolCtrl.loading.value
+                        ? CircularProgressIndicator()
+                        : Text(
+                            'Guardar piscina',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
                   ),
                 ),
               ],

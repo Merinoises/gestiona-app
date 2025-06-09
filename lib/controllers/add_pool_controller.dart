@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class AddPoolController extends GetxController {
+  var loading = false.obs;
   var nombre = ''.obs;
   var ubicacion = ''.obs;
   var fechaApertura = DateTime(DateTime.now().year, 6, 1).obs;
@@ -397,7 +398,7 @@ class AddPoolController extends GetxController {
   }
 
   Future<void> pickHoraInicio(BuildContext ctx) async {
-    final TimeOfDay inicial = TimeOfDay.now();
+    final TimeOfDay inicial = TimeOfDay(hour: 8, minute: 0);
 
     final TimeOfDay? picked = await showTimePicker(
       context: ctx,
@@ -417,7 +418,7 @@ class AddPoolController extends GetxController {
   }
 
   Future<void> pickHoraFinal(BuildContext ctx) async {
-    final TimeOfDay inicial = TimeOfDay.now();
+    final TimeOfDay inicial = TimeOfDay(hour: 20, minute: 0);
 
     final TimeOfDay? picked = await showTimePicker(
       context: ctx,
@@ -461,7 +462,9 @@ class AddPoolController extends GetxController {
     );
 
     final poolCtrl = Get.find<PoolController>();
+    loading.value = true;
     final String? res = await poolCtrl.createPool(nuevaPiscina);
+    loading.value = false;
 
     if (res != null) {
       Get.snackbar('Error', res);
@@ -493,7 +496,9 @@ class AddPoolController extends GetxController {
     );
 
     final poolCtrl = Get.find<PoolController>();
+    loading.value = true;
     final String? res = await poolCtrl.updatePool(editedPool);
+    loading.value = false;
 
     if (res != null) {
       Get.snackbar('Error', res);

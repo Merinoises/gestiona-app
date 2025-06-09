@@ -121,10 +121,12 @@ class PoolController extends GetxController {
   /// Devuelve null si tuvo éxito, o String con mensaje de error.
   Future<String?> deletePool(String id) async {
     try {
+      loading.value = true;
       final resp = await _http.delete(
         '/pools/$id',
         headers: {'Content-Type': 'application/json'},
       );
+      loading.value = false;
       if (resp.statusCode == 200) {
         // Remover de la lista local
         pools.removeWhere((p) => p.id == id);

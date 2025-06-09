@@ -98,38 +98,40 @@ class InicioAccesoScreen extends StatelessWidget {
                   const SizedBox(height: 50),
 
                   //Boton para sign in
-                  BotonAccesoApp(
-                    contenidoBoton: auth.autenticando.value
-                        ? CircularProgressIndicator()
-                        : Text(
-                            'Iniciar sesión',
-                            style: const TextStyle(
-                              color: Color.fromARGB(255, 0, 0, 0),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                  Obx(
+                    () => BotonAccesoApp(
+                      contenidoBoton: auth.autenticando.value
+                          ? CircularProgressIndicator()
+                          : Text(
+                              'Iniciar sesión',
+                              style: const TextStyle(
+                                color: Color.fromARGB(255, 0, 0, 0),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                    onTap: auth.autenticando.value
-                        ? null
-                        : () async {
-                            if (loginCtrl.loginFormKey.currentState!
-                                .validate()) {
-                              loginCtrl.loginFormKey.currentState!.save();
-                              final res = await auth.login(
-                                loginCtrl.nombre.value,
-                                loginCtrl.password.value,
-                              );
-                              if (res == true) {
-                                Get.off(() => StartScreen());
-                              } else {
-                                Get.snackbar(
-                                  'Error',
-                                  res.toString(),
-                                  snackPosition: SnackPosition.BOTTOM,
+                      onTap: auth.autenticando.value
+                          ? null
+                          : () async {
+                              if (loginCtrl.loginFormKey.currentState!
+                                  .validate()) {
+                                loginCtrl.loginFormKey.currentState!.save();
+                                final res = await auth.login(
+                                  loginCtrl.nombre.value,
+                                  loginCtrl.password.value,
                                 );
+                                if (res == true) {
+                                  Get.off(() => StartScreen());
+                                } else {
+                                  Get.snackbar(
+                                    'Error',
+                                    res.toString(),
+                                    snackPosition: SnackPosition.BOTTOM,
+                                  );
+                                }
                               }
-                            }
-                          },
+                            },
+                    ),
                   ),
 
                   const SizedBox(height: 30),

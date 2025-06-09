@@ -182,7 +182,8 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              horaInicio.value = await auxMethods.pickHoraInicio(context);
+                              horaInicio.value = await auxMethods
+                                  .pickHoraInicio(context);
                             },
                             child: Text('Hora inicial'),
                           ),
@@ -203,9 +204,8 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              horaFinal.value = await auxMethods.pickHoraFinalizacion(
-                                context,
-                              );
+                              horaFinal.value = await auxMethods
+                                  .pickHoraFinalizacion(context);
                             },
                             child: Text('Hora final'),
                           ),
@@ -225,98 +225,92 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                 ),
 
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (!formKey.currentState!.validate()) {
-                      // Si el dropdown no está seleccionado, no continua
-                      return;
-                    }
-                    if (horaInicio.value == null || horaFinal.value == null) {
-                      mensajeError.value =
-                          'Escoja la hora de inicio y finalización';
-                      return;
-                    }
-                    // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
-                    final int newStartMin =
-                        horaInicio.value!.hour * 60 + horaInicio.value!.minute;
-                    final int newEndMin =
-                        horaFinal.value!.hour * 60 + horaFinal.value!.minute;
-                    if (newStartMin > newEndMin) {
-                      mensajeError.value =
-                          'La hora de finalización ha de ser posterior a la de inicio';
-                      return;
-                    }
-
-                    final fechaYHoraInicio = DateTime(
-                      fechaDia.year,
-                      fechaDia.month,
-                      fechaDia.day,
-                      horaInicio.value!.hour,
-                      horaInicio.value!.minute,
-                    );
-                    final fechaYHoraFinal = DateTime(
-                      fechaDia.year,
-                      fechaDia.month,
-                      fechaDia.day,
-                      horaFinal.value!.hour,
-                      horaFinal.value!.minute,
-                    );
-                    Turno nuevoTurno = Turno(
-                      id: '',
-                      pool: pool,
-                      start: fechaYHoraInicio,
-                      end: fechaYHoraFinal,
-                    );
-                    socorristasCtrl.loading.value = true;
-                    final String? resp = await socorristasCtrl
-                        .asignarHorarioEnPiscina(
-                          nuevoTurno,
-                          socorristaSeleccionado.value!,
-                        );
-                    if (resp == null) {
-                      Get.back();
-                      socorristasCtrl.loading.value = false;
-                      final index = listaSocorristas.indexWhere(
-                        (u) => u.id == socorristaSeleccionado.value!.id,
-                      );
-                      final Usuario socorristaModificado =
-                          listaSocorristas[index];
-                      setState(() {
+                Obx(
+                  () => ElevatedButton(
+                    onPressed: socorristasCtrl.loading.value ? null : () async {
+                      if (!formKey.currentState!.validate()) {
+                        // Si el dropdown no está seleccionado, no continua
                         return;
-                      });
-                      Get.snackbar(
-                        'Turno agregado a ${socorristaModificado.nombre}',
-                        'Añadido el turno $nuevoTurno',
-                        duration: Duration(seconds: 3),
-                        backgroundColor: Colors.white,
-                      );
-                    } else {
-                      Get.back();
-                      socorristasCtrl.loading.value = false;
-                      Get.snackbar('Error', resp);
-                    }
+                      }
+                      if (horaInicio.value == null || horaFinal.value == null) {
+                        mensajeError.value =
+                            'Escoja la hora de inicio y finalización';
+                        return;
+                      }
+                      // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
+                      final int newStartMin =
+                          horaInicio.value!.hour * 60 +
+                          horaInicio.value!.minute;
+                      final int newEndMin =
+                          horaFinal.value!.hour * 60 + horaFinal.value!.minute;
+                      if (newStartMin > newEndMin) {
+                        mensajeError.value =
+                            'La hora de finalización ha de ser posterior a la de inicio';
+                        return;
+                      }
 
-                    // listaHorarios.add(nuevoHorario);
-                    // selectedDays = List.filled(7, false);
-                    // horaInicio.value = null;
-                    // horaFinal.value = null;
-                    // mensajeError.value = '';
-                    // Get.back();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
-                  ),
-                  child: Obx(() {
-                    return socorristasCtrl.loading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : Text(
-                            'Guardar horario',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      final fechaYHoraInicio = DateTime(
+                        fechaDia.year,
+                        fechaDia.month,
+                        fechaDia.day,
+                        horaInicio.value!.hour,
+                        horaInicio.value!.minute,
+                      );
+                      final fechaYHoraFinal = DateTime(
+                        fechaDia.year,
+                        fechaDia.month,
+                        fechaDia.day,
+                        horaFinal.value!.hour,
+                        horaFinal.value!.minute,
+                      );
+                      Turno nuevoTurno = Turno(
+                        id: '',
+                        pool: pool,
+                        start: fechaYHoraInicio,
+                        end: fechaYHoraFinal,
+                      );
+                      socorristasCtrl.loading.value = true;
+                      final String? resp = await socorristasCtrl
+                          .asignarHorarioEnPiscina(
+                            nuevoTurno,
+                            socorristaSeleccionado.value!,
                           );
-                  }),
+                      if (resp == null) {
+                        Get.back();
+                        socorristasCtrl.loading.value = false;
+                        final index = listaSocorristas.indexWhere(
+                          (u) => u.id == socorristaSeleccionado.value!.id,
+                        );
+                        final Usuario socorristaModificado =
+                            listaSocorristas[index];
+                        setState(() {
+                          return;
+                        });
+                        Get.snackbar(
+                          'Turno agregado a ${socorristaModificado.nombre}',
+                          'Añadido el turno $nuevoTurno',
+                          duration: Duration(seconds: 3),
+                          backgroundColor: Colors.white,
+                        );
+                      } else {
+                        Get.back();
+                        socorristasCtrl.loading.value = false;
+                        Get.snackbar('Error', resp);
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
+                    ),
+                    child: socorristasCtrl.loading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : Text(
+                              'Guardar horario',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                  ),
                 ),
                 SizedBox(height: 8),
                 Obx(
@@ -337,8 +331,6 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
       ),
     );
   }
-
-  
 
   Map<String, List<Turno>> mostrarTurnosDelDia(
     DateTime dia,

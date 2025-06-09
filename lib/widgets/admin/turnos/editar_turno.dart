@@ -172,120 +172,146 @@ class EditarTurno extends StatelessWidget {
               ),
 
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (!formKey.currentState!.validate()) {
-                    // Si el dropdown no está seleccionado, no continua
-                    return;
-                  }
-                  if (rxHoraInicio.value == null || rxHoraFinal.value == null) {
-                    rxMensajeError.value =
-                        'Escoja la hora de inicio y finalización';
-                    return;
-                  }
-                  // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
-                  final int newStartMin =
-                      rxHoraInicio.value!.hour * 60 +
-                      rxHoraInicio.value!.minute;
-                  final int newEndMin =
-                      rxHoraFinal.value!.hour * 60 + rxHoraFinal.value!.minute;
-                  if (newStartMin > newEndMin) {
-                    rxMensajeError.value =
-                        'La hora de finalización ha de ser posterior a la de inicio';
-                    return;
-                  }
+              Obx(
+                () => ElevatedButton(
+                  onPressed: socorristasCtrl.loading.value
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) {
+                            // Si el dropdown no está seleccionado, no continua
+                            return;
+                          }
+                          if (rxHoraInicio.value == null ||
+                              rxHoraFinal.value == null) {
+                            rxMensajeError.value =
+                                'Escoja la hora de inicio y finalización';
+                            return;
+                          }
+                          // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
+                          final int newStartMin =
+                              rxHoraInicio.value!.hour * 60 +
+                              rxHoraInicio.value!.minute;
+                          final int newEndMin =
+                              rxHoraFinal.value!.hour * 60 +
+                              rxHoraFinal.value!.minute;
+                          if (newStartMin > newEndMin) {
+                            rxMensajeError.value =
+                                'La hora de finalización ha de ser posterior a la de inicio';
+                            return;
+                          }
 
-                  final fechaYHoraInicio = DateTime(
-                    turno.start.year,
-                    turno.start.month,
-                    turno.start.day,
-                    rxHoraInicio.value!.hour,
-                    rxHoraInicio.value!.minute,
-                  );
-                  final fechaYHoraFinal = DateTime(
-                    turno.start.year,
-                    turno.start.month,
-                    turno.start.day,
-                    rxHoraFinal.value!.hour,
-                    rxHoraFinal.value!.minute,
-                  );
-                  Turno turnoEditado = Turno(
-                    id: '',
-                    pool: pool,
-                    start: fechaYHoraInicio,
-                    end: fechaYHoraFinal,
-                  );
-                  socorristasCtrl.loading.value = true;
-                  //En caso de no cambiar el socorrista, se actualiza simplemente su turno:
-                  if (nombreSocorrista ==
-                      socorristasCtrl.socorristaSeleccionado.value!.nombre) {
-                    final String? resp = await socorristasCtrl
-                        .actualizarTurnoDeSocorrista(
-                          socorristaSeleccionado.value!.id!,
-                          turno.id,
-                          turnoEditado,
-                        );
-                    socorristasCtrl.loading.value = false;
-                    Get.back();
-                    Get.back();
-                    if (resp == null) {
-                      Get.snackbar(
-                        'Turno editado',
-                        'Editado turno de $nombreSocorrista - ${turnoEditado.fechaYHoraDetallada()}',
-                        backgroundColor: Colors.white,
-                      );
-                    } else {
-                      Get.snackbar(
-                        'Error',
-                        resp,
-                        colorText: Colors.white,
-                        backgroundColor: const Color.fromARGB(193, 244, 67, 54),
-                      );
-                    }
-                  }
-                  //En caso de que cambie de socorrista, hay que eliminar el turno del socorrista inicial y agregar un nuevo turno al otro socorrista
-                  else {
-                    final String? respEliminar = await socorristasCtrl
-                        .eliminarTurnoDeSocorrista(
-                          socorristasCtrl.getIdByNombre(nombreSocorrista)!,
-                          turno.id,
-                        );
-                    final String? respAnyadir = await socorristasCtrl
-                        .asignarHorarioEnPiscina(
-                          turnoEditado,
-                          socorristaSeleccionado.value!,
-                        );
-                    Get.back();
-                    Get.back();
-                    socorristasCtrl.loading.value = false;
-                    if (respEliminar == null && respAnyadir == null) {
-                      Get.snackbar(
-                        'Turno editado',
-                        'añadido turno a ${socorristaSeleccionado.value!.nombre} - ${turnoEditado.fechaYHoraDetallada()}',
-                        backgroundColor: Colors.white,
-                      );
-                    } else if (respEliminar != null) {
-                      Get.snackbar(
-                        'Error',
-                        respEliminar,
-                        colorText: Colors.white,
-                        backgroundColor: const Color.fromARGB(193, 244, 67, 54),
-                      );
-                    } else {
-                      Get.snackbar(
-                        'Error',
-                        respAnyadir!,
-                        colorText: Colors.white,
-                        backgroundColor: const Color.fromARGB(193, 244, 67, 54),
-                      );
-                    }
-                  }
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
-                ),
-                child: Obx(() {
-                  return socorristasCtrl.loading.value
+                          final fechaYHoraInicio = DateTime(
+                            turno.start.year,
+                            turno.start.month,
+                            turno.start.day,
+                            rxHoraInicio.value!.hour,
+                            rxHoraInicio.value!.minute,
+                          );
+                          final fechaYHoraFinal = DateTime(
+                            turno.start.year,
+                            turno.start.month,
+                            turno.start.day,
+                            rxHoraFinal.value!.hour,
+                            rxHoraFinal.value!.minute,
+                          );
+                          Turno turnoEditado = Turno(
+                            id: '',
+                            pool: pool,
+                            start: fechaYHoraInicio,
+                            end: fechaYHoraFinal,
+                          );
+                          socorristasCtrl.loading.value = true;
+                          //En caso de no cambiar el socorrista, se actualiza simplemente su turno:
+                          if (nombreSocorrista ==
+                              socorristasCtrl
+                                  .socorristaSeleccionado
+                                  .value!
+                                  .nombre) {
+                            final String? resp = await socorristasCtrl
+                                .actualizarTurnoDeSocorrista(
+                                  socorristaSeleccionado.value!.id!,
+                                  turno.id,
+                                  turnoEditado,
+                                );
+                            socorristasCtrl.loading.value = false;
+                            Get.back();
+                            Get.back();
+                            if (resp == null) {
+                              Get.snackbar(
+                                'Turno editado',
+                                'Editado turno de $nombreSocorrista - ${turnoEditado.fechaYHoraDetallada()}',
+                                backgroundColor: Colors.white,
+                              );
+                            } else {
+                              Get.snackbar(
+                                'Error',
+                                resp,
+                                colorText: Colors.white,
+                                backgroundColor: const Color.fromARGB(
+                                  193,
+                                  244,
+                                  67,
+                                  54,
+                                ),
+                              );
+                            }
+                          }
+                          //En caso de que cambie de socorrista, hay que eliminar el turno del socorrista inicial y agregar un nuevo turno al otro socorrista
+                          else {
+                            final String? respEliminar = await socorristasCtrl
+                                .eliminarTurnoDeSocorrista(
+                                  socorristasCtrl.getIdByNombre(
+                                    nombreSocorrista,
+                                  )!,
+                                  turno.id,
+                                );
+                            final String? respAnyadir = await socorristasCtrl
+                                .asignarHorarioEnPiscina(
+                                  turnoEditado,
+                                  socorristaSeleccionado.value!,
+                                );
+                            Get.back();
+                            Get.back();
+                            socorristasCtrl.loading.value = false;
+                            if (respEliminar == null && respAnyadir == null) {
+                              Get.snackbar(
+                                'Turno editado',
+                                'añadido turno a ${socorristaSeleccionado.value!.nombre} - ${turnoEditado.fechaYHoraDetallada()}',
+                                backgroundColor: Colors.white,
+                              );
+                            } else if (respEliminar != null) {
+                              Get.snackbar(
+                                'Error',
+                                respEliminar,
+                                colorText: Colors.white,
+                                backgroundColor: const Color.fromARGB(
+                                  193,
+                                  244,
+                                  67,
+                                  54,
+                                ),
+                              );
+                            } else {
+                              Get.snackbar(
+                                'Error',
+                                respAnyadir!,
+                                colorText: Colors.white,
+                                backgroundColor: const Color.fromARGB(
+                                  193,
+                                  244,
+                                  67,
+                                  54,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  style: ButtonStyle(
+                    backgroundColor: socorristasCtrl.loading.value
+                        ? null
+                        : WidgetStatePropertyAll(Colors.blue[400]),
+                  ),
+                  child: socorristasCtrl.loading.value
                       ? Center(child: CircularProgressIndicator())
                       : Text(
                           'Guardar horario editado',
@@ -293,8 +319,8 @@ class EditarTurno extends StatelessWidget {
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
-                        );
-                }),
+                        ),
+                ),
               ),
               SizedBox(height: 8),
               Obx(

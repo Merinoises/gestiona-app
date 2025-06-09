@@ -7,10 +7,7 @@ import 'package:intl/intl.dart';
 
 class EliminarPiscina extends StatelessWidget {
   final Pool pool;
-  const EliminarPiscina({
-    super.key,
-    required this.pool
-  });
+  const EliminarPiscina({super.key, required this.pool});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +40,11 @@ class EliminarPiscina extends StatelessWidget {
             children: [
               Text(
                 '¿Quiere eliminar esta piscina?',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: const Color.fromARGB(199, 244, 67, 54)),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: const Color.fromARGB(199, 244, 67, 54),
+                ),
               ),
               SizedBox(height: 20),
               Padding(
@@ -75,22 +76,28 @@ class EliminarPiscina extends StatelessWidget {
                           'Fecha de apertura: ',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Expanded(child: Text(dateFormat.format(pool.fechaApertura!))),
+                        Expanded(
+                          child: Text(dateFormat.format(pool.fechaApertura!)),
+                        ),
                       ],
                     ),
                     Text(
-                          'Horarios semanales: ',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                    ...pool.weeklySchedules.map((weekSch) => Text(weekSch.toString())),
+                      'Horarios semanales: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    ...pool.weeklySchedules.map(
+                      (weekSch) => Text(weekSch.toString()),
+                    ),
                     Text(
-                          'Horarios especiales: ',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                      'Horarios especiales: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     if (pool.specialSchedules.isNotEmpty)
-                    ...pool.specialSchedules.map((weekSch) => Text(weekSch.toString()))
-                    else 
-                    Text('No hay horarios especiales')
+                      ...pool.specialSchedules.map(
+                        (weekSch) => Text(weekSch.toString()),
+                      )
+                    else
+                      Text('No hay horarios especiales'),
                   ],
                 ),
               ),
@@ -108,67 +115,69 @@ class EliminarPiscina extends StatelessWidget {
                         const Color.fromARGB(255, 255, 255, 255),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.penToSquare,
-                          color: Colors.black,
-                        ),
-                        Text(
-                          ' Volver',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      ' Volver',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      String? resp = await poolCtrl.deletePool(pool.id!);
-                      Get.back();
-                      Get.back();
-                      if (resp == null) {
-                        Get.snackbar(
-                          'Piscina eliminada',
-                          'Eliminada piscina ${pool.nombre}',
-                          backgroundColor: Colors.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          resp,
-                          colorText: Colors.white,
-                          backgroundColor: const Color.fromARGB(
-                            193,
-                            244,
-                            67,
-                            54,
-                          ),
-                        );
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        const Color.fromARGB(176, 244, 67, 54),
+                  Obx(
+                    () => ElevatedButton(
+                      onPressed: poolCtrl.loading.value
+                          ? null
+                          : () async {
+                              String? resp = await poolCtrl.deletePool(
+                                pool.id!,
+                              );
+                              Get.back();
+                              Get.back();
+                              if (resp == null) {
+                                Get.snackbar(
+                                  'Piscina eliminada',
+                                  'Eliminada piscina ${pool.nombre}',
+                                  backgroundColor: Colors.white,
+                                );
+                              } else {
+                                Get.snackbar(
+                                  'Error',
+                                  resp,
+                                  colorText: Colors.white,
+                                  backgroundColor: const Color.fromARGB(
+                                    193,
+                                    244,
+                                    67,
+                                    54,
+                                  ),
+                                );
+                              }
+                            },
+                      style: ButtonStyle(
+                        backgroundColor: poolCtrl.loading.value
+                            ? null
+                            : WidgetStatePropertyAll(
+                                const Color.fromARGB(176, 244, 67, 54),
+                              ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.circleXmark,
-                          color: const Color.fromARGB(255, 255, 255, 255),
-                        ),
-                        Text(
-                          ' Eliminar',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                      child: Row(
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.circleXmark,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                           ),
-                        ),
-                      ],
+                          poolCtrl.loading.value
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  ' Eliminar',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

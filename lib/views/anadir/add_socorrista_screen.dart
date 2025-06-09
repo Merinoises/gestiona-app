@@ -10,6 +10,8 @@ class AddSocorristaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final socorristasCtrl = Get.find<SocorristasController>();
+
     String nombre = '';
     String password = '';
 
@@ -83,33 +85,49 @@ class AddSocorristaScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
+                Obx(
+                  () => ElevatedButton(
+                    onPressed: socorristasCtrl.loading.value ? null : () async {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        final Usuario nuevoSocorrista = Usuario(
+                          nombre: nombre,
+                          password: password,
+                          isAdmin: false,
+                        );
 
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      
-                      _formKey.currentState!.save();
-                      final Usuario nuevoSocorrista = Usuario(nombre: nombre, password: password, isAdmin: false);
-                      final socorristasCtrl = Get.find<SocorristasController>();
-                      final String? resp = await socorristasCtrl.createSocorrista(nuevoSocorrista);
-                      if (resp == null) {
-                        Get.back();
-                        Get.snackbar('Socorrista creado', 'Socorrista $nombre ha sido creado.', colorText: Colors.white, duration: Duration(seconds: 3));
-                      } else {
-                        Get.snackbar('Error al crear socorrista', resp, backgroundColor: Colors.red[400], colorText: Colors.white, duration: Duration(seconds: 3));
+                        final String? resp = await socorristasCtrl
+                            .createSocorrista(nuevoSocorrista);
+                        if (resp == null) {
+                          Get.back();
+                          Get.snackbar(
+                            'Socorrista creado',
+                            'Socorrista $nombre ha sido creado.',
+                            colorText: Colors.white,
+                            duration: Duration(seconds: 3),
+                          );
+                        } else {
+                          Get.snackbar(
+                            'Error al crear socorrista',
+                            resp,
+                            backgroundColor: Colors.red[400],
+                            colorText: Colors.white,
+                            duration: Duration(seconds: 3),
+                          );
+                        }
                       }
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      const Color.fromARGB(255, 255, 184, 255),
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: socorristasCtrl.loading.value ? null : WidgetStatePropertyAll(
+                        const Color.fromARGB(255, 255, 184, 255),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'Guardar socorrista',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                    child: socorristasCtrl.loading.value ? CircularProgressIndicator() : Text(
+                      'Guardar socorrista',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
                 ),
