@@ -14,7 +14,7 @@ class EditarOEliminarPiscina extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat _dateFormat = DateFormat('dd/MM/yyyy');
+    final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
     return AlertDialog(
       backgroundColor: Colors
@@ -75,7 +75,7 @@ class EditarOEliminarPiscina extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Expanded(
-                          child: Text(_dateFormat.format(pool.fechaApertura!)),
+                          child: Text(dateFormat.format(pool.fechaApertura!)),
                         ),
                       ],
                     ),

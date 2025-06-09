@@ -14,7 +14,7 @@ class EliminarPiscina extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat _dateFormat = DateFormat('dd/mm/yyyy');
+    final DateFormat dateFormat = DateFormat('dd/mm/yyyy');
     final PoolController poolCtrl = Get.find<PoolController>();
 
     return AlertDialog(
@@ -75,7 +75,7 @@ class EliminarPiscina extends StatelessWidget {
                           'Fecha de apertura: ',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Expanded(child: Text(_dateFormat.format(pool.fechaApertura!))),
+                        Expanded(child: Text(dateFormat.format(pool.fechaApertura!))),
                       ],
                     ),
                     Text(

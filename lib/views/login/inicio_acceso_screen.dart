@@ -122,7 +122,6 @@ class InicioAccesoScreen extends StatelessWidget {
                               if (res == true) {
                                 Get.off(() => StartScreen());
                               } else {
-                                print(res.toString());
                                 Get.snackbar(
                                   'Error',
                                   res.toString(),

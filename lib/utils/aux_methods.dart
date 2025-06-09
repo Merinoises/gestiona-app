@@ -10,8 +10,9 @@ class AuxMethods {
     final DateTime today = DateTime.now();
     if (date.year == today.year &&
         date.month == today.month &&
-        date.day == today.day)
+        date.day == today.day) {
       return true;
+    }
     return false;
   }
 
@@ -142,11 +143,7 @@ class _DashedLinePainter extends CustomPainter {
     // Dibujamos guiones de izquierda a derecha
     while (startX < size.width) {
       final endX = (startX + dashWidth).clamp(0.0, size.width);
-      canvas.drawLine(
-        Offset(startX, y),
-        Offset(endX, y),
-        paint,
-      );
+      canvas.drawLine(Offset(startX, y), Offset(endX, y), paint);
       startX += dashWidth + dashGap;
     }
   }
@@ -154,8 +151,8 @@ class _DashedLinePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _DashedLinePainter old) {
     return old.dashWidth != dashWidth ||
-           old.dashGap != dashGap ||
-           old.color != color ||
-           old.strokeWidth != strokeWidth;
+        old.dashGap != dashGap ||
+        old.color != color ||
+        old.strokeWidth != strokeWidth;
   }
 }

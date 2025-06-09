@@ -66,6 +66,7 @@ class Turno {
 
   /// Para serializar a JSON (solo campos necesarios al crear o actualizar):
   /// {
+  // ignore: unintended_html_in_doc_comment
   ///   "poolId": "<id de la piscina>",
   ///   "start": "2025-06-01T08:00:00.000Z",
   ///   "end":   "2025-06-01T16:30:00.000Z"

@@ -89,8 +89,7 @@ class InitialsCircle extends StatelessWidget {
   /// El diámetro del círculo. Por defecto 48.0 puntos.
   final double size;
 
-  const InitialsCircle({Key? key, required this.text, this.size = 48.0})
-    : super(key: key);
+  const InitialsCircle({super.key, required this.text, this.size = 48.0});
 
   @override
   Widget build(BuildContext context) {

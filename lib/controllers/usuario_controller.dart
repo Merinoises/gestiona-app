@@ -11,14 +11,6 @@ class UsuarioController extends GetxController {
   /// El usuario actual. Si no hay nadie logueado, será `null`.
   final Rxn<Usuario> usuario = Rxn<Usuario>();
 
-
-  @override
-  void onInit() {
-    super.onInit();
-    // Aquí podrías, por ejemplo, cargar las piscinas iniciales
-    // o escuchar a algún servicio externo (AuthService) para poblar `usuario`.
-  }
-
   /// Indica si hay un usuario logueado en este momento.
   bool get isLoggedIn => usuario.value != null;
 
@@ -46,7 +38,9 @@ class UsuarioController extends GetxController {
     final poolCtrl = Get.find<PoolController>();
     // Asegurarnos de que allPools no esté vacío
     if (poolCtrl.pools.isEmpty) {
-      throw Exception('Debe llamar a setPools(...) antes de reconstruir Usuario desde JSON');
+      throw Exception(
+        'Debe llamar a setPools(...) antes de reconstruir Usuario desde JSON',
+      );
     }
     final nuevo = Usuario.fromJson(json, poolCtrl.pools);
     usuario.value = nuevo;
@@ -124,4 +118,3 @@ class UsuarioController extends GetxController {
     super.onClose();
   }
 }
-

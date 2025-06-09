@@ -8,10 +8,10 @@ class DaysSelector extends StatefulWidget {
   const DaysSelector({super.key, required this.selectedDays});
 
   @override
-  _DaysSelectorState createState() => _DaysSelectorState();
+  DaysSelectorState createState() => DaysSelectorState();
 }
 
-class _DaysSelectorState extends State<DaysSelector> {
+class DaysSelectorState extends State<DaysSelector> {
 
   // Etiquetas para cada día (abreviadas)
   final List<String> _dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];

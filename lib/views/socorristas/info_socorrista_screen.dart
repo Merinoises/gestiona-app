@@ -109,7 +109,7 @@ class _InfoSocorristaScreenState extends State<InfoSocorristaScreen> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
 
                   const Divider(height: 32),
 
