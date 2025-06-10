@@ -14,7 +14,7 @@ class SocoCalendarioScreen extends StatefulWidget {
 
 class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
   DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay  = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
 
   bool _tieneHorarioEseDia(DateTime day) {
@@ -46,20 +46,20 @@ class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
   @override
   Widget build(BuildContext context) {
     final authService = Get.find<AuthService>();
-    final usuario     = authService.usuario.value!;
+    final usuario = authService.usuario.value!;
     // Filtrar solo los turnos de ESTE usuario y ESTA piscina:
     final misTurnosEnPool = usuario.turnos
-      .where((t) => t.pool.id == widget.pool.id)
-      .toList();
+        .where((t) => t.pool.id == widget.pool.id)
+        .toList();
     // Crear set de fechas con turno
     final diasConTurno = misTurnosEnPool
-      .map((t) => DateTime(t.start.year, t.start.month, t.start.day))
-      .toSet();
+        .map((t) => DateTime(t.start.year, t.start.month, t.start.day))
+        .toSet();
 
     // Map<String,List<Turno>> para el día seleccionado, pero solo este usuario:
     final turnosHoy = misTurnosEnPool
-      .where((t) => isSameDay(t.start, _selectedDay))
-      .toList();
+        .where((t) => isSameDay(t.start, _selectedDay))
+        .toList();
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.pool.nombre)),
@@ -68,19 +68,20 @@ class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
         child: Column(
           children: [
             TableCalendar(
-              firstDay: DateTime(DateTime.now().year,6,1),
-              lastDay:  DateTime(DateTime.now().year,10,30),
+              firstDay: DateTime(DateTime.now().year, 6, 1),
+              lastDay: DateTime(DateTime.now().year, 10, 30),
               focusedDay: _focusedDay,
               calendarFormat: _calendarFormat,
-              onFormatChanged: (f)=>setState(()=>_calendarFormat=f),
-              selectedDayPredicate: (d)=>isSameDay(d,_selectedDay),
-              onDaySelected: (d,f){
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              onFormatChanged: (f) => setState(() => _calendarFormat = f),
+              selectedDayPredicate: (d) => isSameDay(d, _selectedDay),
+              onDaySelected: (d, f) {
                 setState(() {
                   _selectedDay = d;
-                  _focusedDay  = f;
+                  _focusedDay = f;
                 });
               },
-              enabledDayPredicate: (d)=> _tieneHorarioEseDia(d),
+              enabledDayPredicate: (d) => _tieneHorarioEseDia(d),
               locale: 'es_ES',
 
               calendarBuilders: CalendarBuilders(
@@ -102,7 +103,8 @@ class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
                       child: Text(
                         '${date.day}',
                         style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     );
@@ -126,8 +128,9 @@ class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
-                    child: Text('${date.day}',
-                      style: TextStyle(color: Colors.white)
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.white),
                     ),
                   );
                 },
@@ -135,7 +138,8 @@ class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
 
               calendarStyle: CalendarStyle(
                 disabledDecoration: BoxDecoration(
-                  color: Colors.grey.shade300, shape: BoxShape.circle
+                  color: Colors.grey.shade300,
+                  shape: BoxShape.circle,
                 ),
                 disabledTextStyle: TextStyle(color: Colors.black38),
                 markerDecoration: BoxDecoration(), // no usamos marcadores
@@ -149,21 +153,19 @@ class _SocoCalendarioScreenState extends State<SocoCalendarioScreen> {
             ),
             const SizedBox(height: 8),
 
-            if (turnosHoy.isEmpty)
-              Text('No tienes turnos asignados'),
-            ...turnosHoy.map((t) => Padding(
-              padding: const EdgeInsets.symmetric(vertical:4.0),
-              child: Text(
-                t.fechaYHoraDetallada(), 
-                style: TextStyle(fontSize: 14),
+            if (turnosHoy.isEmpty) Text('No tienes turnos asignados'),
+            ...turnosHoy.map(
+              (t) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  t.fechaYHoraDetallada(),
+                  style: TextStyle(fontSize: 14),
+                ),
               ),
-            )),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-
-

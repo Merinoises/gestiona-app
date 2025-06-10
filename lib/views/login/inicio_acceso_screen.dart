@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestiona_app/controllers/login_controller.dart';
 import 'package:gestiona_app/services/auth_service.dart';
-import 'package:gestiona_app/views/start/start_screen.dart';
+import 'package:gestiona_app/views/login/loading.dart';
 import 'package:gestiona_app/widgets/login/boton_acceso_app.dart';
 import 'package:gestiona_app/widgets/login/inicio_sesion_textfield.dart';
 
@@ -39,11 +39,11 @@ class InicioAccesoScreen extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                   ),
                   //logo
-                  // CachedNetworkImage(
-                  //       imageUrl: '${Environment.apiUrl}/images/logo_app.png',
-                  //       height: 150,
-                  //       fit: BoxFit.contain,
-                  //     ),
+                  Image.asset(
+                    'assets/logo-app.png',
+                    height: 150,
+                    fit: BoxFit.contain,
+                  ),
                   // CachedNetworkImage(
                   //       imageUrl: '${Environment.apiUrl}/images/logo_invictest.png',
                   //       width: MediaQuery.of(context).size.width*0.8,
@@ -54,7 +54,7 @@ class InicioAccesoScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 60.0),
                     child: Text(
-                      'Bienvenido a la aplicación móvil de GESTIONA',
+                      'Bienvenido a la aplicación móvil de GESTIONA - Piscinas',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16),
                     ),
@@ -121,7 +121,8 @@ class InicioAccesoScreen extends StatelessWidget {
                                   loginCtrl.password.value,
                                 );
                                 if (res == true) {
-                                  Get.off(() => StartScreen());
+                                  
+                                  Get.offAll(() => LoadingScreen());
                                 } else {
                                   Get.snackbar(
                                     'Error',

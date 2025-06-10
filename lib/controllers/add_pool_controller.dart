@@ -20,185 +20,199 @@ class AddPoolController extends GetxController {
   final dateFormat = DateFormat('dd/MM/yyyy');
 
   void mostrarSelectorHorario(BuildContext context) {
+    final maxWidth = MediaQuery.of(context).size.width * 0.9;
     Get.dialog(
       AlertDialog(
+        scrollable: true, // ① permite scroll si crece
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: 16, // ② márgenes en pantalla
+          vertical: 24,
+        ),
         backgroundColor: Colors
             .transparent, // opcional: para que el degradado sea visible en los bordes
         contentPadding: EdgeInsets
             .zero, // para que el contenido ocupe todo el espacio disponible dentro del AlertDialog
-        content: Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft, // Punto de inicio del degradado
-              end: Alignment.bottomRight, // Punto final del degradado
-              colors: [
-                Color.fromARGB(255, 255, 255, 255), // Color inicial
-                Color.fromARGB(255, 191, 237, 255), // Color final
-              ],
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: Container(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft, // Punto de inicio del degradado
+                end: Alignment.bottomRight, // Punto final del degradado
+                colors: [
+                  Color.fromARGB(255, 255, 255, 255), // Color inicial
+                  Color.fromARGB(255, 191, 237, 255), // Color final
+                ],
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'CREAR HORARIO',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 30),
-                Text(
-                  'Seleccionar días de la semana',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                DaysSelector(selectedDays: selectedDays),
-                SizedBox(height: 20),
-                Text(
-                  'Horas de inicio y finalización',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Obx(
-                  () => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => pickHoraInicio(context),
-                            child: Text('Hora inicial'),
-                          ),
-                          horaInicio.value != null
-                              ? SizedBox(height: 10)
-                              : SizedBox.shrink(),
-                          horaInicio.value != null
-                              ? Text(
-                                  horaInicio.value!.format(context),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              : SizedBox.shrink(),
-                        ],
-                      ),
-
-                      SizedBox(width: 10),
-                      Column(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => pickHoraFinal(context),
-                            child: Text('Hora final'),
-                          ),
-                          horaFinal.value != null
-                              ? SizedBox(height: 10)
-                              : SizedBox.shrink(),
-                          horaFinal.value != null
-                              ? Text(
-                                  horaFinal.value!.format(context),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              : SizedBox.shrink(),
-                        ],
-                      ),
-                    ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'CREAR HORARIO',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    final List<int> daysOfTheWeek = [];
-                    for (int i = 0; i < selectedDays.length; i++) {
-                      if (selectedDays[i]) {
-                        daysOfTheWeek.add(i + 1);
-                      }
-                    }
-                    if (daysOfTheWeek.isEmpty) {
-                      mensajeError.value =
-                          'Escoja al menos un día de la semana';
-                      return;
-                    }
-                    if (horaInicio.value == null || horaFinal.value == null) {
-                      mensajeError.value =
-                          'Escoja la hora de inicio y finalización';
-                      return;
-                    }
-                    // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
-                    final int newStartMin =
-                        horaInicio.value!.hour * 60 + horaInicio.value!.minute;
-                    final int newEndMin =
-                        horaFinal.value!.hour * 60 + horaFinal.value!.minute;
-                    if (newStartMin > newEndMin) {
-                      mensajeError.value =
-                          'La hora de finalización ha de ser mayor que la de inicio';
-                      return;
-                    }
-
-                    for (WeeklySchedule horario in listaHorarios) {
-                      // 1) Comprobar si comparten al menos un día de la semana:
-                      bool diasCoinciden = horario.weekdays.any(
-                        (dia) => daysOfTheWeek.contains(dia),
-                      );
-                      if (!diasCoinciden) continue;
-
-                      // 2) Si comparten día, comprobamos solapamiento de horas
-                      final int existingStartMin =
-                          horario.timeRange.start.hour * 60 +
-                          horario.timeRange.start.minute;
-                      final int existingEndMin =
-                          horario.timeRange.end.hour * 60 +
-                          horario.timeRange.end.minute;
-
-                      // Dos intervalos [A_inicio, A_fin) y [B_inicio, B_fin) se solapan
-                      // si y solo si: A_inicio < B_fin  &&  B_inicio < A_fin
-                      if (newStartMin < existingEndMin &&
-                          existingStartMin < newEndMin) {
-                        mensajeError.value =
-                            'El horario que quieres establecer se solapa con otro horario existente';
-                        return;
-                      }
-                    }
-
-                    WeeklySchedule nuevoHorario = WeeklySchedule(
-                      weekdays: daysOfTheWeek,
-                      timeRange: TimeRange(
-                        start: horaInicio.value!,
-                        end: horaFinal.value!,
-                      ),
-                    );
-
-                    listaHorarios.add(nuevoHorario);
-                    selectedDays = List.filled(7, false);
-                    horaInicio.value = null;
-                    horaFinal.value = null;
-                    mensajeError.value = '';
-                    Get.back();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
+                  SizedBox(height: 30),
+                  Text(
+                    'Seleccionar días de la semana',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  child: Text(
-                    'Guardar horario',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(height: 10),
+                  DaysSelector(selectedDays: selectedDays),
+                  SizedBox(height: 20),
+                  Text(
+                    'Horas de inicio y finalización',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Obx(
+                    () => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => pickHoraInicio(context),
+                              child: Text('Hora inicial'),
+                            ),
+                            horaInicio.value != null
+                                ? SizedBox(height: 10)
+                                : SizedBox.shrink(),
+                            horaInicio.value != null
+                                ? Text(
+                                    horaInicio.value!.format(context),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                          ],
+                        ),
+
+                        SizedBox(width: 10),
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => pickHoraFinal(context),
+                              child: Text('Hora final'),
+                            ),
+                            horaFinal.value != null
+                                ? SizedBox(height: 10)
+                                : SizedBox.shrink(),
+                            horaFinal.value != null
+                                ? Text(
+                                    horaFinal.value!.format(context),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                SizedBox(height: 8),
-                Obx(() {
-                  return mensajeError.value != ''
-                      ? Text(
-                          mensajeError.value,
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      : SizedBox.shrink();
-                }),
-              ],
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      final List<int> daysOfTheWeek = [];
+                      for (int i = 0; i < selectedDays.length; i++) {
+                        if (selectedDays[i]) {
+                          daysOfTheWeek.add(i + 1);
+                        }
+                      }
+                      if (daysOfTheWeek.isEmpty) {
+                        mensajeError.value =
+                            'Escoja al menos un día de la semana';
+                        return;
+                      }
+                      if (horaInicio.value == null || horaFinal.value == null) {
+                        mensajeError.value =
+                            'Escoja la hora de inicio y finalización';
+                        return;
+                      }
+                      // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
+                      final int newStartMin =
+                          horaInicio.value!.hour * 60 +
+                          horaInicio.value!.minute;
+                      final int newEndMin =
+                          horaFinal.value!.hour * 60 + horaFinal.value!.minute;
+                      if (newStartMin > newEndMin) {
+                        mensajeError.value =
+                            'La hora de finalización ha de ser mayor que la de inicio';
+                        return;
+                      }
+
+                      for (WeeklySchedule horario in listaHorarios) {
+                        // 1) Comprobar si comparten al menos un día de la semana:
+                        bool diasCoinciden = horario.weekdays.any(
+                          (dia) => daysOfTheWeek.contains(dia),
+                        );
+                        if (!diasCoinciden) continue;
+
+                        // 2) Si comparten día, comprobamos solapamiento de horas
+                        final int existingStartMin =
+                            horario.timeRange.start.hour * 60 +
+                            horario.timeRange.start.minute;
+                        final int existingEndMin =
+                            horario.timeRange.end.hour * 60 +
+                            horario.timeRange.end.minute;
+
+                        // Dos intervalos [A_inicio, A_fin) y [B_inicio, B_fin) se solapan
+                        // si y solo si: A_inicio < B_fin  &&  B_inicio < A_fin
+                        if (newStartMin < existingEndMin &&
+                            existingStartMin < newEndMin) {
+                          mensajeError.value =
+                              'El horario que quieres establecer se solapa con otro horario existente';
+                          return;
+                        }
+                      }
+
+                      WeeklySchedule nuevoHorario = WeeklySchedule(
+                        weekdays: daysOfTheWeek,
+                        timeRange: TimeRange(
+                          start: horaInicio.value!,
+                          end: horaFinal.value!,
+                        ),
+                      );
+
+                      listaHorarios.add(nuevoHorario);
+                      selectedDays = List.filled(7, false);
+                      horaInicio.value = null;
+                      horaFinal.value = null;
+                      mensajeError.value = '';
+                      Get.back();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
+                    ),
+                    child: Text(
+                      'Guardar horario',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Obx(() {
+                    return mensajeError.value != ''
+                        ? Text(
+                            mensajeError.value,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : SizedBox.shrink();
+                  }),
+                ],
+              ),
             ),
           ),
         ),

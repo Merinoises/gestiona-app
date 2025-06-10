@@ -33,12 +33,12 @@ class LoadingScreen extends StatelessWidget {
         final socorristasCtrl = Get.find<SocorristasController>();
         await socorristasCtrl.loadSocorristas();
       } catch (e) {
-        Get.to(() => InicioAccesoScreen());
+        Get.offAll(() => InicioAccesoScreen());
         Get.snackbar('Error de carga', e.toString());
       }
-      Get.to(() => StartScreen());
+      Get.offAll(() => StartScreen());
     } else {
-      Get.to(() => InicioAccesoScreen());
+      Get.offAll(() => InicioAccesoScreen());
     }
   }
 }
