@@ -42,30 +42,37 @@ class SocoPiscinasScreen extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: ListView.builder(
-            itemCount: piscinasConTurnos.length,
-            itemBuilder: (context, index) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    auxMeths.capitalize(piscinasConTurnos[index].nombre),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+          child: piscinasConTurnos.isEmpty
+              ? Center(
+                  child: Text(
+                    '🏖️ Aún no se te ha asignado ninguna piscina...',
                   ),
-                  subtitle: Text(piscinasConTurnos[index].ubicacion),
-                  trailing: IconButton(
-                    onPressed: () => Get.to(
-                      () =>
-                          SocoCalendarioScreen(pool: piscinasConTurnos[index]),
-                    ),
-                    icon: FaIcon(FontAwesomeIcons.eye),
-                    color: Colors.pinkAccent,
+                )
+              : ListView.builder(
+                  itemCount: piscinasConTurnos.length,
+                  itemBuilder: (context, index) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text(
+                          auxMeths.capitalize(piscinasConTurnos[index].nombre),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(piscinasConTurnos[index].ubicacion),
+                        trailing: IconButton(
+                          onPressed: () => Get.to(
+                            () => SocoCalendarioScreen(
+                              pool: piscinasConTurnos[index],
+                            ),
+                          ),
+                          icon: FaIcon(FontAwesomeIcons.eye),
+                          color: Colors.pinkAccent,
+                        ),
+                      ),
+                      Divider(),
+                    ],
                   ),
                 ),
-                Divider(),
-              ],
-            ),
-          ),
         ),
       ),
     );
