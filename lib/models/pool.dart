@@ -174,8 +174,8 @@ class SpecialSchedule {
 
   factory SpecialSchedule.fromJson(Map<String, dynamic> json) {
     // parseamos sólo la parte fecha, luego normalizamos a medianoche LOCAL
-    final raw = json['date'] as String;               // e.g. "2025-06-18"
-    final d = DateTime.parse(raw);                    // 2025-06-18 00:00:00.000 (local)
+    final raw = json['date'] as String; // e.g. "2025-06-18"
+    final d = DateTime.parse(raw); // 2025-06-18 00:00:00.000 (local)
     final localDate = DateTime(d.year, d.month, d.day);
     return SpecialSchedule(
       date: localDate,
@@ -260,12 +260,16 @@ class Pool {
 
   /// Construye un Pool desde JSON (respuesta de la API).
   factory Pool.fromJson(Map<String, dynamic> json) {
+    DateTime normalizeDate(DateTime dt) {
+      return DateTime(dt.year, dt.month, dt.day);
+    }
+
     return Pool(
       id: json['_id'] as String?,
       nombre: json['nombre'] as String,
       ubicacion: json['ubicacion'] as String,
       fechaApertura: json['fechaApertura'] != null
-          ? DateTime.parse(json['fechaApertura'] as String).toLocal()
+          ? normalizeDate(DateTime.parse(json['fechaApertura'] as String).toLocal())
           : null,
       weeklySchedules: (json['weeklySchedules'] as List<dynamic>? ?? [])
           .map((w) => WeeklySchedule.fromJson(w as Map<String, dynamic>))
