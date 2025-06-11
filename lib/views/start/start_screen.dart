@@ -30,7 +30,7 @@ class StartScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'GESTIONA S.L. - Socorrismo',
-          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         automaticallyImplyLeading: false,
         actions: [
@@ -131,9 +131,7 @@ class StartScreen extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: isAdmin
-          ? null
-          : FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Get.offAll(() => LoadingScreen());
               },

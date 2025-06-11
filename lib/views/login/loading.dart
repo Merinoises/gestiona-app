@@ -16,7 +16,17 @@ class LoadingScreen extends StatelessWidget {
       body: FutureBuilder(
         future: checkLoginState(context),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          return const Center(child: Text('Espere...'));
+          return Center(child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                    'assets/logo-app.png',
+                    height: 150,
+                    fit: BoxFit.contain,
+                  ),
+              Text('Cargando...', style: TextStyle(fontWeight: FontWeight.bold),),
+            ],
+          ));
         },
       ),
     );

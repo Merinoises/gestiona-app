@@ -1,4 +1,4 @@
-package com.example.gestiona_app
+package com.antonio.gestionapiscinas
 
 import io.flutter.embedding.android.FlutterActivity
 

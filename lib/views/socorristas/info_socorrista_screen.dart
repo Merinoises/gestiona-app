@@ -45,8 +45,8 @@ class _InfoSocorristaScreenState extends State<InfoSocorristaScreen> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Datos socorrista: ${auxMethods.capitalize(socorrista.nombre)}',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            'Socorrista: ${auxMethods.capitalize(socorrista.nombre)}',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
         body: Container(

@@ -17,207 +17,216 @@ class EditarPiscina extends StatelessWidget {
     final AddPoolController addPoolCtrl = Get.find<AddPoolController>();
 
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft, // Punto de inicio del degradado
-              end: Alignment.bottomRight, // Punto final del degradado
-              colors: [
-                Color.fromARGB(255, 255, 255, 255), // Color inicial
-                Color.fromARGB(255, 255, 188, 188), // Color final
-              ],
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height
             ),
-          ),
-          child: Padding(
-            padding: EdgeInsetsGeometry.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Añadir piscina',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      EditPoolTextForm(
-                        validator: (val) {
-                          if (val == null || val.trim().isEmpty) {
-                            return 'Debes seleccionar un nombre';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          addPoolCtrl.nombre.value = value!;
-                        },
-                        hintText: 'Nombre de la piscina',
-                        nombrePiscina: addPoolCtrl.nombre.value,
-                      ),
-                      SizedBox(height: 8),
-                      EditPoolTextForm(
-                        validator: (val) {
-                          if (val == null || val.trim().isEmpty) {
-                            return 'Debes seleccionar una ubicación';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          addPoolCtrl.ubicacion.value = value!;
-                        },
-                        hintText: 'Ubicación',
-                        nombrePiscina: addPoolCtrl.ubicacion.value,
-                      ),
-                      SizedBox(height: 20),
-
-                      Obx(
-                        () => TextFormField(
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            labelText: 'Fecha de apertura',
-                            border: const OutlineInputBorder(),
-                            suffixIcon: const Icon(Icons.calendar_today),
-                          ),
-                          // Si ya hay fecha seleccionada, la mostramos formateada; si no, placeholder
-                          controller: TextEditingController(
-                            text: _dateFormat.format(
-                              addPoolCtrl.fechaApertura.value,
-                            ),
-                          ),
-                          onTap: () => addPoolCtrl.pickFechaApertura(context),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Lista de horarios',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft, // Punto de inicio del degradado
+                  end: Alignment.bottomRight, // Punto final del degradado
+                  colors: [
+                    Color.fromARGB(255, 255, 255, 255), // Color inicial
+                    Color.fromARGB(255, 255, 188, 188), // Color final
                   ],
                 ),
-                SizedBox(height: 8),
-                Obx(() {
-                  if (addPoolCtrl.listaHorarios.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-
-                  // Puedes usar ListView.builder para listas grandes:
-                  return ListView.builder(
-                    itemCount: addPoolCtrl.listaHorarios.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final texto = addPoolCtrl.listaHorarios[index].toString();
-                      return ListTile(
-                        title: Text('🕒 $texto'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            addPoolCtrl.eliminarHorario(index);
-                          },
-                        ),
-                      );
-                    },
-                  );
-                }),
-                GestureDetector(
-                  onTap: () => addPoolCtrl.mostrarSelectorHorario(context),
-                  child: Row(
-                    children: [
-                      Icon(Icons.add_circle, color: Colors.lightBlue[300]),
-                      SizedBox(width: 5),
-                      Text('Añadir horario'),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+              ),
+              child: Padding(
+                padding: EdgeInsetsGeometry.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      'Lista de horarios especiales',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Obx(() {
-                  if (addPoolCtrl.listaHorariosEspeciales.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-
-                  // Puedes usar ListView.builder para listas grandes:
-                  return ListView.builder(
-                    itemCount: addPoolCtrl.listaHorariosEspeciales.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final texto = addPoolCtrl.listaHorariosEspeciales[index]
-                          .toString();
-                      return ListTile(
-                        title: Text('✨ $texto'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            addPoolCtrl.eliminarHorarioEspecial(index);
-                          },
-                        ),
-                      );
-                    },
-                  );
-                }),
-                GestureDetector(
-                  onTap: () =>
-                      addPoolCtrl.mostrarSelectorHorarioEspecial(context),
-                  child: Row(
-                    children: [
-                      Icon(Icons.add_circle, color: Colors.lightBlue[300]),
-                      SizedBox(width: 5),
-                      Text('Añadir horario especial'),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30),
-                Obx(
-                  () => ElevatedButton(
-                    onPressed: addPoolCtrl.loading.value
-                        ? null
-                        : () async {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              await addPoolCtrl.editarPiscina(pool.id!);
-                              addPoolCtrl.resetAll();
-                              Get.back();
-                            }
-                          },
-                    style: ButtonStyle(
-                      backgroundColor: addPoolCtrl.loading.value
-                          ? null
-                          : WidgetStatePropertyAll(
-                              const Color.fromARGB(255, 255, 184, 255),
-                            ),
-                    ),
-                    child: addPoolCtrl.loading.value
-                        ? CircularProgressIndicator()
-                        : Text(
-                            'Actualizar piscina',
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Editar piscina ${pool.nombre}',
                             style: TextStyle(
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
                             ),
                           ),
-                  ),
+                          SizedBox(height: 20),
+                          EditPoolTextForm(
+                            validator: (val) {
+                              if (val == null || val.trim().isEmpty) {
+                                return 'Debes seleccionar un nombre';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              addPoolCtrl.nombre.value = value!;
+                            },
+                            hintText: 'Nombre de la piscina',
+                            nombrePiscina: addPoolCtrl.nombre.value,
+                          ),
+                          SizedBox(height: 8),
+                          EditPoolTextForm(
+                            validator: (val) {
+                              if (val == null || val.trim().isEmpty) {
+                                return 'Debes seleccionar una ubicación';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              addPoolCtrl.ubicacion.value = value!;
+                            },
+                            hintText: 'Ubicación',
+                            nombrePiscina: addPoolCtrl.ubicacion.value,
+                          ),
+                          SizedBox(height: 20),
+                    
+                          Obx(
+                            () => TextFormField(
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                labelText: 'Fecha de apertura',
+                                border: const OutlineInputBorder(),
+                                suffixIcon: const Icon(Icons.calendar_today),
+                              ),
+                              // Si ya hay fecha seleccionada, la mostramos formateada; si no, placeholder
+                              controller: TextEditingController(
+                                text: _dateFormat.format(
+                                  addPoolCtrl.fechaApertura.value,
+                                ),
+                              ),
+                              onTap: () => addPoolCtrl.pickFechaApertura(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Lista de horarios',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Obx(() {
+                      if (addPoolCtrl.listaHorarios.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                    
+                      // Puedes usar ListView.builder para listas grandes:
+                      return ListView.builder(
+                        itemCount: addPoolCtrl.listaHorarios.length,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final texto = addPoolCtrl.listaHorarios[index].toString();
+                          return ListTile(
+                            title: Text('🕒 $texto'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                addPoolCtrl.eliminarHorario(index);
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    }),
+                    GestureDetector(
+                      onTap: () => addPoolCtrl.mostrarSelectorHorario(context),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add_circle, color: Colors.lightBlue[300]),
+                          SizedBox(width: 5),
+                          Text('Añadir horario'),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Lista de horarios especiales',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Obx(() {
+                      if (addPoolCtrl.listaHorariosEspeciales.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                    
+                      // Puedes usar ListView.builder para listas grandes:
+                      return ListView.builder(
+                        itemCount: addPoolCtrl.listaHorariosEspeciales.length,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final texto = addPoolCtrl.listaHorariosEspeciales[index]
+                              .toString();
+                          return ListTile(
+                            title: Text('✨ $texto'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                addPoolCtrl.eliminarHorarioEspecial(index);
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    }),
+                    GestureDetector(
+                      onTap: () =>
+                          addPoolCtrl.mostrarSelectorHorarioEspecial(context),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add_circle, color: Colors.lightBlue[300]),
+                          SizedBox(width: 5),
+                          Text('Añadir horario especial'),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    Obx(
+                      () => ElevatedButton(
+                        onPressed: addPoolCtrl.loading.value
+                            ? null
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  await addPoolCtrl.editarPiscina(pool.id!);
+                                  addPoolCtrl.resetAll();
+                                  Get.back();
+                                }
+                              },
+                        style: ButtonStyle(
+                          backgroundColor: addPoolCtrl.loading.value
+                              ? null
+                              : WidgetStatePropertyAll(
+                                  const Color.fromARGB(255, 255, 184, 255),
+                                ),
+                        ),
+                        child: addPoolCtrl.loading.value
+                            ? CircularProgressIndicator()
+                            : Text(
+                                'Actualizar piscina',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

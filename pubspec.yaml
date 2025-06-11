@@ -1,7 +1,7 @@
 name: gestiona_app
-description: "A new Flutter project."
+description: "App de gestión de piscinas y socorristas para ayuntamientos y empresas."
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0+2
 
 environment:
   sdk: ^3.8.0
