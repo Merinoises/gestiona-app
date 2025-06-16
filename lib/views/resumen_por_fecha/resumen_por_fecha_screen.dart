@@ -48,7 +48,6 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Pool> pools = poolCtrl.pools;
-    final List<Usuario> socorristas = socoCtrl.socorristas;
 
     final List<Pool> visiblePools = pools.where((p) {
     if (p.fechaApertura == null) return true;
