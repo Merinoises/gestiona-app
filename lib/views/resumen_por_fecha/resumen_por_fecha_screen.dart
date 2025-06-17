@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gestiona_app/controllers/pool_controller.dart';
 import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/models/pool.dart';
-import 'package:gestiona_app/models/usuario.dart';
+import 'package:gestiona_app/utils/aux_methods.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -50,15 +50,15 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
     final List<Pool> pools = poolCtrl.pools;
 
     final List<Pool> visiblePools = pools.where((p) {
-    if (p.fechaApertura == null) return true;
-    // Normalizamos ambos a fecha sin hora
-    final apertura = DateTime(
-      p.fechaApertura!.year,
-      p.fechaApertura!.month,
-      p.fechaApertura!.day,
-    );
-    return !fechaSeleccionada!.isBefore(apertura);
-  }).toList();
+      if (p.fechaApertura == null) return true;
+      // Normalizamos ambos a fecha sin hora
+      final apertura = DateTime(
+        p.fechaApertura!.year,
+        p.fechaApertura!.month,
+        p.fechaApertura!.day,
+      );
+      return !fechaSeleccionada!.isBefore(apertura);
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -148,6 +148,10 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
                         pool,
                         fechaSeleccionada!,
                       );
+                      final mensajesError = _horarioNoCubiertoMensajes(
+                        horarios,
+                        pool,
+                      );
                       final haySocorristas = socoCtrl.socorristas.any(
                         (soc) => soc.turnos.any(
                           (turno) =>
@@ -186,8 +190,13 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
                         ),
                         trailing: (horarios.isNotEmpty && !haySocorristas)
                             ? const Icon(Icons.warning, color: Colors.red)
+                            : mensajesError.isNotEmpty
+                            ? const Icon(
+                                Icons.error,
+                                color: Color.fromARGB(255, 101, 36, 223),
+                              )
                             : null,
-                        children: _buildTurnosForPool(context, pool),
+                        children: _buildTurnosForPool(pool, mensajesError),
                       );
                     },
                   ),
@@ -204,12 +213,34 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  List<Widget> _buildTurnosForPool(BuildContext context, Pool pool) {
+  List<Widget> _buildTurnosForPool(Pool pool, List<String> mensajesError) {
     final List<Widget> tiles = [];
+
+    tiles.addAll(
+      mensajesError
+          .map(
+            (m) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  FaIcon(FontAwesomeIcons.triangleExclamation),
+                  SizedBox(width: 12,),
+                  Expanded(
+                    child: Text(
+                      m,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+    );
 
     for (final soc in socoCtrl.socorristas) {
       for (final turno in soc.turnos) {
-        // Asume que turno.fecha es DateTime,
         // turno.poolId enlaza con pool.id,
         // y turno.horaInicio/turno.horaFin son TimeOfDay o DateTime
         if (turno.pool.id == pool.id &&
@@ -219,7 +250,7 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
 
           tiles.add(
             ListTile(
-              leading: FaIcon(FontAwesomeIcons.lifeRing),
+              leading: Text('🛟', style: TextStyle(fontSize: 20)),
               title: Text(
                 soc.nombre,
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -315,5 +346,125 @@ class _ResumenPorFechaScreenState extends State<ResumenPorFechaScreen> {
 
     // 3) No hay nada → cerrado
     return [];
+  }
+
+  List<String> _horarioNoCubiertoMensajes(
+    List<TimeRange> horariosPool,
+    Pool pool,
+  ) {
+    List<String> mensajesDeError = [];
+
+    List<TimeRange> turnosDelDia = [];
+
+    final AuxMethods aux = AuxMethods();
+
+    for (final soc in socoCtrl.socorristas) {
+      for (final turno in soc.turnos) {
+        if (turno.pool.id == pool.id &&
+            _isSameDate(turno.start, fechaSeleccionada!)) {
+          for (final horario in horariosPool) {
+            if (!horario.contains(
+              TimeOfDay(hour: turno.start.hour, minute: turno.start.minute),
+            )) {
+              mensajesDeError.add(
+                '${aux.capitalize(soc.nombre)} empieza antes del horario establecido.',
+              );
+            }
+            if (!horario.contains(
+              TimeOfDay(hour: turno.end.hour, minute: turno.end.minute),
+            )) {
+              mensajesDeError.add(
+                '${aux.capitalize(soc.nombre)} termina después del horario establecido.',
+              );
+            }
+          }
+          turnosDelDia.add(
+            TimeRange(
+              start: TimeOfDay(
+                hour: turno.start.hour,
+                minute: turno.start.minute,
+              ),
+              end: TimeOfDay(hour: turno.end.hour, minute: turno.end.minute),
+            ),
+          );
+        }
+      }
+    }
+    if (turnosDelDia.isEmpty) {
+      return mensajesDeError;
+    }
+
+    List<TimeRange> turnosUnificados = _mergeTimeRanges(turnosDelDia);
+
+    for (final horario in horariosPool) {
+      List<TimeRange> gaps = _calculateGaps(horario, turnosUnificados);
+      if (gaps.isNotEmpty) {
+        mensajesDeError.add(
+          'Faltan socorristas para cubrir completamente el horario de la piscina.',
+        );
+      }
+    }
+
+    return mensajesDeError;
+  }
+
+  List<TimeRange> _mergeTimeRanges(List<TimeRange> ranges) {
+    if (ranges.isEmpty) return [];
+
+    ranges.sort((a, b) => _compareTimeOfDay(a.start, b.start));
+    List<TimeRange> result = [ranges.first];
+
+    for (int i = 1; i < ranges.length; i++) {
+      TimeRange last = result.last;
+      TimeRange current = ranges[i];
+
+      if (_overlapsOrAdjacent(last, current)) {
+        result[result.length - 1] = TimeRange(
+          start: last.start,
+          end: _maxTimeOfDay(last.end, current.end),
+        );
+      } else {
+        result.add(current);
+      }
+    }
+
+    return result;
+  }
+
+  bool _overlapsOrAdjacent(TimeRange a, TimeRange b) {
+    return !_isBefore(a.end, b.start);
+  }
+
+  int _compareTimeOfDay(TimeOfDay a, TimeOfDay b) {
+    return (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute);
+  }
+
+  bool _isBefore(TimeOfDay a, TimeOfDay b) {
+    return _compareTimeOfDay(a, b) < 0;
+  }
+
+  TimeOfDay _maxTimeOfDay(TimeOfDay a, TimeOfDay b) {
+    return _compareTimeOfDay(a, b) >= 0 ? a : b;
+  }
+
+  List<TimeRange> _calculateGaps(TimeRange horario, List<TimeRange> turnos) {
+    List<TimeRange> gaps = [];
+
+    TimeOfDay current = horario.start;
+
+    for (final turno in turnos) {
+      if (_isBefore(current, turno.start)) {
+        gaps.add(TimeRange(start: current, end: turno.start));
+      }
+      if (_compareTimeOfDay(turno.end, current) > 0) {
+        current = turno.end;
+      }
+    }
+
+    if (_isBefore(current, horario.end)) {
+      gaps.add(TimeRange(start: current, end: horario.end));
+    }
+
+    return gaps;
   }
 }
