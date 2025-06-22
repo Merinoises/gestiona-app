@@ -67,7 +67,8 @@ class SocorristasController extends GetxController {
               (u) =>
                   Usuario.fromJson(u as Map<String, dynamic>, poolCtrl.pools),
             )
-            .toList();
+            .toList()
+            ..sort((a,b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
       } else {
         socorristas.clear();
       }
@@ -97,6 +98,7 @@ class SocorristasController extends GetxController {
           poolCtrl.pools,
         );
         socorristas.add(creado);
+        socorristas.sort((a,b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
         return null;
       } else {
         final msg = (resp.body != null && resp.body is Map)

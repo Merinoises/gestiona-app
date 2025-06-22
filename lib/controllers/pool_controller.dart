@@ -38,7 +38,8 @@ class PoolController extends GetxController {
         final List<dynamic> data = resp.body as List<dynamic>;
         pools.value = data
             .map((p) => Pool.fromJson(p as Map<String, dynamic>))
-            .toList();
+            .toList()
+            ..sort((a,b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));;
       } else {
         // En caso de código distinto o body nulo, limpiar lista
         pools.clear();
@@ -75,6 +76,7 @@ class PoolController extends GetxController {
         // Re-construir el Pool recién creado y agregarlo a la lista
         final newPool = Pool.fromJson(resp.body['pool'] as Map<String, dynamic>);
         pools.add(newPool);
+        pools.sort((a,b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
         return null;
       } else {
         // Intentar leer mensaje de error
