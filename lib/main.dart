@@ -3,6 +3,7 @@ import 'package:gestiona_app/controllers/add_pool_controller.dart';
 import 'package:gestiona_app/controllers/pool_controller.dart';
 import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/services/auth_service.dart';
+import 'package:gestiona_app/services/version_service.dart';
 import 'package:gestiona_app/views/login/loading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -15,6 +16,7 @@ void main() async {
   Get.put(PoolController());
   Get.put(AddPoolController());
   Get.put(SocorristasController());
+  Get.put(VersionService(), permanent: true);
   runApp(const MainApp());
 }
 
