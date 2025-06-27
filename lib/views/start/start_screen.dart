@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gestiona_app/controllers/socorristas_controller.dart';
 import 'package:gestiona_app/global/environment.dart';
 import 'package:gestiona_app/models/usuario.dart';
@@ -28,27 +29,8 @@ class StartScreen extends StatelessWidget {
     final bool isAdmin = usuario.isAdmin;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'GESTIONA S.L. - Socorrismo',
-          style: TextStyle(
-            color: Colors.red,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await authService.logout();
-              Get.to(() => LoadingScreen());
-            },
-            icon: Icon(Icons.exit_to_app),
-          ),
-        ],
-      ),
       body: Container(
+        constraints: BoxConstraints.expand(),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft, // Punto de inicio del degradado
@@ -59,103 +41,160 @@ class StartScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsetsGeometry.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text('Usuario: ${authService.usuario.value!.nombre}'),
-                      SizedBox(width: 2),
-                      isAdmin ? Text('(admin)') : SizedBox.shrink(),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  CardSeleccion(
-                    rutaALaImagenDeFondo:
-                        '${Environment.apiUrl}/images/piscinas-card.png',
-                    titulo: isAdmin ? 'Gestionar piscinas' : 'Mis piscinas',
-                    subtitulo: isAdmin
-                        ? null
-                        : 'Accede para ver tus turnos de trabajo',
-                    alturaCard: MediaQuery.of(context).size.height * (1 / 6),
-                    anchuraCard: MediaQuery.of(context).size.height * 0.8,
-                    onPressed: () {
-                      isAdmin
-                          ? Get.to(() => AdminPiscinasScreen())
-                          : Get.to(() => SocoPiscinasScreen());
-                    },
-                  ),
-                  // SizedBox(height: 20,),
-                  CardSeleccion(
-                    rutaALaImagenDeFondo:
-                        '${Environment.apiUrl}/images/socorristas-card.png',
-                    titulo: isAdmin ? 'Gestionar socorristas' : 'Mis datos',
-                    subtitulo: isAdmin
-                        ? null
-                        : 'Horarios, turnos, horas trabajadas',
-                    alturaCard: MediaQuery.of(context).size.height * (1 / 6),
-                    anchuraCard: MediaQuery.of(context).size.height * 0.8,
-                    onPressed: () {
-                      if (isAdmin) {
-                        Get.to(() => AdminSocorristasScreen());
-                      } else {
-                        socorristasController.socorristaSeleccionado.value =
-                            usuario;
-                        Get.to(() => InfoSocorristaScreen());
-                      }
-                    },
-                  ),
-                  isAdmin
-                      ? CardSeleccion(
-                          rutaALaImagenDeFondo:
-                              '${Environment.apiUrl}/images/piscinas-fechas-card.png',
-                          titulo: 'Resumen por día',
-                          subtitulo:
-                              'Consultar todos los datos resumidos para un día concreto',
-                          alturaCard:
-                              MediaQuery.of(context).size.height * (1 / 6),
-                          anchuraCard: MediaQuery.of(context).size.height * 0.8,
-                          onPressed: () {
-                            Get.to(() => ResumenPorFechaScreen());
-                          },
-                        )
-                      : SizedBox.shrink(),
-                  isAdmin
-                      ? Row(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: EdgeInsetsGeometry.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Column(
                           children: [
-                            MiscelaneaCard(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Image.asset(
+                                  'assets/GESTIONA-LOGO.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  fit: BoxFit.fitWidth,
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    await authService.logout();
+                                    Get.to(() => LoadingScreen());
+                                  },
+                                  icon: Icon(Icons.exit_to_app),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              children: [
+                                FaIcon(
+                                  FontAwesomeIcons.user,
+                                  size: 16,
+                                  color: Colors.red,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Usuario: ',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(authService.usuario.value!.nombre),
+                                SizedBox(width: 2),
+                                isAdmin ? Text('(admin)') : SizedBox.shrink(),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            CardSeleccion(
                               rutaALaImagenDeFondo:
-                                  '${Environment.apiUrl}/images/anadir-piscina.png',
-                              titulo: 'Añadir piscina',
+                                  '${Environment.apiUrl}/images/piscinas-card.png',
+                              titulo: isAdmin
+                                  ? 'Gestionar piscinas'
+                                  : 'Mis piscinas',
+                              subtitulo: isAdmin
+                                  ? null
+                                  : 'Accede para ver tus turnos de trabajo',
+                              alturaCard:
+                                  MediaQuery.of(context).size.height * (1 / 6),
+                              anchuraCard:
+                                  MediaQuery.of(context).size.height * 0.8,
                               onPressed: () {
-                                Get.to(() => AddPoolScreen());
+                                isAdmin
+                                    ? Get.to(() => AdminPiscinasScreen())
+                                    : Get.to(() => SocoPiscinasScreen());
                               },
                             ),
-                            SizedBox(width: 20),
-                            MiscelaneaCard(
+                            // SizedBox(height: 20,),
+                            CardSeleccion(
                               rutaALaImagenDeFondo:
-                                  '${Environment.apiUrl}/images/anadir-socorrista.png',
-                              titulo: 'Añadir socorrista',
+                                  '${Environment.apiUrl}/images/socorristas-card.png',
+                              titulo: isAdmin
+                                  ? 'Gestionar socorristas'
+                                  : 'Mis datos',
+                              subtitulo: isAdmin
+                                  ? null
+                                  : 'Horarios, turnos, horas trabajadas',
+                              alturaCard:
+                                  MediaQuery.of(context).size.height * (1 / 6),
+                              anchuraCard:
+                                  MediaQuery.of(context).size.height * 0.8,
                               onPressed: () {
-                                Get.to(() => AddSocorristaScreen());
+                                if (isAdmin) {
+                                  Get.to(() => AdminSocorristasScreen());
+                                } else {
+                                  socorristasController
+                                          .socorristaSeleccionado
+                                          .value =
+                                      usuario;
+                                  Get.to(() => InfoSocorristaScreen());
+                                }
                               },
                             ),
+                            isAdmin
+                                ? CardSeleccion(
+                                    rutaALaImagenDeFondo:
+                                        '${Environment.apiUrl}/images/piscinas-fechas-card.png',
+                                    titulo: 'Resumen por día',
+                                    subtitulo:
+                                        'Consultar todos los datos resumidos para un día concreto',
+                                    alturaCard:
+                                        MediaQuery.of(context).size.height *
+                                        (1 / 6),
+                                    anchuraCard:
+                                        MediaQuery.of(context).size.height *
+                                        0.8,
+                                    onPressed: () {
+                                      Get.to(() => ResumenPorFechaScreen());
+                                    },
+                                  )
+                                : SizedBox.shrink(),
+                            isAdmin
+                                ? Row(
+                                    children: [
+                                      MiscelaneaCard(
+                                        rutaALaImagenDeFondo:
+                                            '${Environment.apiUrl}/images/anadir-piscina.png',
+                                        titulo: 'Añadir piscina',
+                                        onPressed: () {
+                                          Get.to(() => AddPoolScreen());
+                                        },
+                                      ),
+                                      SizedBox(width: 20),
+                                      MiscelaneaCard(
+                                        rutaALaImagenDeFondo:
+                                            '${Environment.apiUrl}/images/anadir-socorrista.png',
+                                        titulo: 'Añadir socorrista',
+                                        onPressed: () {
+                                          Get.to(() => AddSocorristaScreen());
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                : SizedBox.shrink(),
                           ],
-                        )
-                      : SizedBox.shrink(),
-                  SizedBox(height: 200),
-                  Text(
-                    'Gestiona Piscinas App - All rights reserved',
-                    style: TextStyle(fontSize: 10),
+                        ),
+                        Text(
+                          'Gestiona Piscinas App - All rights reserved',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(

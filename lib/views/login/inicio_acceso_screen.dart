@@ -34,9 +34,10 @@ class InicioAccesoScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 30),
-                  Text(
-                    'GESTIONA S.L.',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                  Image.asset(
+                    'assets/GESTIONA-LOGO.png',
+                    height: 110,
+                    fit: BoxFit.contain,
                   ),
                   //logo
                   Image.asset(
