@@ -46,7 +46,11 @@ class _InfoSocorristaScreenState extends State<InfoSocorristaScreen> {
         appBar: AppBar(
           title: Text(
             'Socorrista: ${auxMethods.capitalize(socorrista.nombre)}',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
         ),
         body: Container(
@@ -379,6 +383,66 @@ class _InfoSocorristaScreenState extends State<InfoSocorristaScreen> {
                         ),
                       ),
                     ),
+                  ],
+                  if (poolsDelSocorrista.isNotEmpty) ...[
+                    const Divider(height: 32),
+                    const Text(
+                      '📝 Horas realizadas por piscina',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Recorremos cada piscina
+                    ...poolsDelSocorrista.map((pool) {
+                      // Filtramos sólo turnos completados (end < ahora)
+                      final turnosCompletados = socorrista.turnos
+                          .where(
+                            (t) =>
+                                t.pool.id == pool.id && t.end.isBefore(ahora),
+                          )
+                          .toList();
+                      // Acumulamos duración por mes
+                      final Map<int, Duration> horasPorMes = {};
+                      for (var turno in turnosCompletados) {
+                        final m = turno.start.month;
+                        horasPorMes[m] =
+                            (horasPorMes[m] ?? Duration.zero) + turno.duracion;
+                      }
+                      // Ordenamos meses y descartamos meses sin horas
+                      final mesesConHoras = horasPorMes.keys.toList()..sort();
+                      if (mesesConHoras.isEmpty) return const SizedBox.shrink();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              pool.nombre,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            // Listado de meses con horas
+                            ...mesesConHoras.map((mes) {
+                              final dur = horasPorMes[mes]!;
+                              final horasStr = auxMethods.formatDuration(dur);
+                              final nombreMes = auxMethods.nombreMes(mes);
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 16.0,
+                                  bottom: 2.0,
+                                ),
+                                child: Text('$nombreMes: $horasStr'),
+                              );
+                            }),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                   SizedBox(height: 50),
                 ],

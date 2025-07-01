@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gestiona_app/controllers/add_pool_controller.dart';
 import 'package:gestiona_app/controllers/pool_controller.dart';
 import 'package:gestiona_app/controllers/socorristas_controller.dart';
@@ -11,6 +12,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await GetStorage.init();
   Get.put(AuthService());
   Get.put(PoolController());
