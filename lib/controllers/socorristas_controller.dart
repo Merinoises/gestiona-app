@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gestiona_app/controllers/pool_controller.dart';
+import 'package:gestiona_app/models/pool.dart';
 import 'package:gestiona_app/models/turno.dart';
 import 'package:get/get.dart';
 import 'package:gestiona_app/global/environment.dart';
@@ -62,13 +63,19 @@ class SocorristasController extends GetxController {
       if (resp.statusCode == 200 && resp.body != null) {
         final List<dynamic> data = resp.body as List<dynamic>;
         final poolCtrl = Get.find<PoolController>();
-        socorristas.value = data
-            .map(
-              (u) =>
-                  Usuario.fromJson(u as Map<String, dynamic>, poolCtrl.pools),
-            )
-            .toList()
-            ..sort((a,b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
+        socorristas.value =
+            data
+                .map(
+                  (u) => Usuario.fromJson(
+                    u as Map<String, dynamic>,
+                    poolCtrl.pools,
+                  ),
+                )
+                .toList()
+              ..sort(
+                (a, b) =>
+                    a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()),
+              );
       } else {
         socorristas.clear();
       }
@@ -98,7 +105,9 @@ class SocorristasController extends GetxController {
           poolCtrl.pools,
         );
         socorristas.add(creado);
-        socorristas.sort((a,b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
+        socorristas.sort(
+          (a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()),
+        );
         return null;
       } else {
         final msg = (resp.body != null && resp.body is Map)
@@ -329,5 +338,30 @@ class SocorristasController extends GetxController {
     } catch (e) {
       return 'Error de red: $e';
     }
+  }
+
+  String totalHorasEnPiscinaMes({
+    required Pool piscina,
+    required int anyo,
+    required int mes,
+  }) {
+    Duration total = Duration.zero;
+
+    // Recorre cada socorrista
+    for (final soc in socorristas) {
+      // Recorre cada turno de ese socorrista
+      for (final turno in soc.turnos) {
+        // Comprueba misma piscina y mismo mes/año
+        if (turno.pool.id == piscina.id &&
+            turno.start.year == anyo &&
+            turno.start.month == mes) {
+          total += turno.duracion;
+        }
+      }
+    }
+    int horas = total.inHours;
+    int minutos = total.inMinutes.remainder(60);
+
+    return '${horas}h ${minutos}m';
   }
 }

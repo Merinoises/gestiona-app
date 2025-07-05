@@ -22,6 +22,7 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
   DateTime _selectedDay = DateTime.now();
   // Mes que se está mostrando actualmente en la cabecera:
   DateTime _focusedDay = DateTime.now();
+  late int _currentMonth;
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
 
@@ -227,89 +228,93 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                 SizedBox(height: 20),
                 Obx(
                   () => ElevatedButton(
-                    onPressed: socorristasCtrl.loading.value ? null : () async {
-                      if (!formKey.currentState!.validate()) {
-                        // Si el dropdown no está seleccionado, no continua
-                        return;
-                      }
-                      if (horaInicio.value == null || horaFinal.value == null) {
-                        mensajeError.value =
-                            'Escoja la hora de inicio y finalización';
-                        return;
-                      }
-                      // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
-                      final int newStartMin =
-                          horaInicio.value!.hour * 60 +
-                          horaInicio.value!.minute;
-                      final int newEndMin =
-                          horaFinal.value!.hour * 60 + horaFinal.value!.minute;
-                      if (newStartMin > newEndMin) {
-                        mensajeError.value =
-                            'La hora de finalización ha de ser posterior a la de inicio';
-                        return;
-                      }
+                    onPressed: socorristasCtrl.loading.value
+                        ? null
+                        : () async {
+                            if (!formKey.currentState!.validate()) {
+                              // Si el dropdown no está seleccionado, no continua
+                              return;
+                            }
+                            if (horaInicio.value == null ||
+                                horaFinal.value == null) {
+                              mensajeError.value =
+                                  'Escoja la hora de inicio y finalización';
+                              return;
+                            }
+                            // Convertimos la hora de inicio y fin a minutos para comparar con facilidad:
+                            final int newStartMin =
+                                horaInicio.value!.hour * 60 +
+                                horaInicio.value!.minute;
+                            final int newEndMin =
+                                horaFinal.value!.hour * 60 +
+                                horaFinal.value!.minute;
+                            if (newStartMin > newEndMin) {
+                              mensajeError.value =
+                                  'La hora de finalización ha de ser posterior a la de inicio';
+                              return;
+                            }
 
-                      final fechaYHoraInicio = DateTime(
-                        fechaDia.year,
-                        fechaDia.month,
-                        fechaDia.day,
-                        horaInicio.value!.hour,
-                        horaInicio.value!.minute,
-                      );
-                      final fechaYHoraFinal = DateTime(
-                        fechaDia.year,
-                        fechaDia.month,
-                        fechaDia.day,
-                        horaFinal.value!.hour,
-                        horaFinal.value!.minute,
-                      );
-                      Turno nuevoTurno = Turno(
-                        id: '',
-                        pool: pool,
-                        start: fechaYHoraInicio,
-                        end: fechaYHoraFinal,
-                      );
-                      socorristasCtrl.loading.value = true;
-                      final String? resp = await socorristasCtrl
-                          .asignarHorarioEnPiscina(
-                            nuevoTurno,
-                            socorristaSeleccionado.value!,
-                          );
-                      if (resp == null) {
-                        Get.back();
-                        socorristasCtrl.loading.value = false;
-                        final index = listaSocorristas.indexWhere(
-                          (u) => u.id == socorristaSeleccionado.value!.id,
-                        );
-                        final Usuario socorristaModificado =
-                            listaSocorristas[index];
-                        setState(() {
-                          return;
-                        });
-                        Get.snackbar(
-                          'Turno agregado a ${socorristaModificado.nombre}',
-                          'Añadido el turno $nuevoTurno',
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.white,
-                        );
-                      } else {
-                        Get.back();
-                        socorristasCtrl.loading.value = false;
-                        Get.snackbar('Error', resp);
-                      }
-                    },
+                            final fechaYHoraInicio = DateTime(
+                              fechaDia.year,
+                              fechaDia.month,
+                              fechaDia.day,
+                              horaInicio.value!.hour,
+                              horaInicio.value!.minute,
+                            );
+                            final fechaYHoraFinal = DateTime(
+                              fechaDia.year,
+                              fechaDia.month,
+                              fechaDia.day,
+                              horaFinal.value!.hour,
+                              horaFinal.value!.minute,
+                            );
+                            Turno nuevoTurno = Turno(
+                              id: '',
+                              pool: pool,
+                              start: fechaYHoraInicio,
+                              end: fechaYHoraFinal,
+                            );
+                            socorristasCtrl.loading.value = true;
+                            final String? resp = await socorristasCtrl
+                                .asignarHorarioEnPiscina(
+                                  nuevoTurno,
+                                  socorristaSeleccionado.value!,
+                                );
+                            if (resp == null) {
+                              Get.back();
+                              socorristasCtrl.loading.value = false;
+                              final index = listaSocorristas.indexWhere(
+                                (u) => u.id == socorristaSeleccionado.value!.id,
+                              );
+                              final Usuario socorristaModificado =
+                                  listaSocorristas[index];
+                              setState(() {
+                                return;
+                              });
+                              Get.snackbar(
+                                'Turno agregado a ${socorristaModificado.nombre}',
+                                'Añadido el turno $nuevoTurno',
+                                duration: Duration(seconds: 3),
+                                backgroundColor: Colors.white,
+                              );
+                            } else {
+                              Get.back();
+                              socorristasCtrl.loading.value = false;
+                              Get.snackbar('Error', resp);
+                            }
+                          },
                     style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Colors.blue[400]),
                     ),
                     child: socorristasCtrl.loading.value
-                          ? Center(child: CircularProgressIndicator())
-                          : Text(
-                              'Guardar horario',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                        ? Center(child: CircularProgressIndicator())
+                        : Text(
+                            'Guardar horario',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
                   ),
                 ),
                 SizedBox(height: 8),
@@ -365,6 +370,12 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
 
   bool isSameDate(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentMonth = _focusedDay.month;
   }
 
   @override
@@ -528,7 +539,10 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
 
                   // Cuando cambia el mes (al avanzar/agregar flechas)
                   onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
+                    setState(() {
+                      _focusedDay = focusedDay;
+                      _currentMonth = _focusedDay.month;
+                    });
                   },
 
                   // Configurar idioma (opcional, requerir intl y localización en MaterialApp)
@@ -725,6 +739,15 @@ class _AdminCalendarioScreenState extends State<AdminCalendarioScreen> {
                       ),
                     ],
                   ),
+                Divider(),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '🌊🏊 Horas mes de ${auxMethods.nombreMes(_currentMonth)}: ${socorristasCtrl.totalHorasEnPiscinaMes(piscina: widget.pool, anyo: _focusedDay.year, mes: _currentMonth)}',
+                  ),
+                ),
+
+                Divider(),
 
                 // ---------------------------------------------------
               ],

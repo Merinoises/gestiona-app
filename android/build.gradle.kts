@@ -1,3 +1,16 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Gradle Plugin para Android (última versión)
+        classpath("com.android.tools.build:gradle:8.11.0")
+        // Plugin de Google Services (FCM, Analytics…)
+        classpath("com.google.gms:google-services:4.4.2")
+    }
+}
+
 allprojects {
     repositories {
         google()

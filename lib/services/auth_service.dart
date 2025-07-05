@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:gestiona_app/services/fcm-service.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -19,6 +20,7 @@ class AuthService extends GetxService {
 
   final _storage = GetStorage();
   final _http = GetConnect();
+  final _fcm = Get.find<FcmService>();
 
   /// Lista de todas las piscinas, necesaria para reconstruir Turno.fromJson(...)
   final RxList<Pool> pools = <Pool>[].obs;
@@ -30,7 +32,7 @@ class AuthService extends GetxService {
 
     // Cargar piscinas UNA VEZ al iniciar el servicio.
     ever<bool>(autenticando, (_) {
-      // (opcional) podrías reaccionar a cambios en autenticando, 
+      // (opcional) podrías reaccionar a cambios en autenticando,
       // pero en realidad queremos cargar piscinas en init.
     });
     _cargarTodasLasPiscinas();
@@ -49,7 +51,7 @@ class AuthService extends GetxService {
             .toList();
       } else {
         // Si falla, puedes manejarlo aquí (por ejemplo intentar recargar más tarde)
-        // En este ejemplo, dejaremos la lista vacía y confiaremos en que haya 
+        // En este ejemplo, dejaremos la lista vacía y confiaremos en que haya
         // un usuario admin o que no se intente reconstruir turnos sin pools.
         pools.clear();
       }
@@ -90,6 +92,9 @@ class AuthService extends GetxService {
 
         usuario.value = loginResp.usuario;
         await _storage.write('token', loginResp.token);
+        //Manejamos aquí el FCM token para notificaciones push
+        await _fcm.requestPermission();
+        await _fcm.registerToken();
         return true;
       }
 
@@ -124,7 +129,7 @@ class AuthService extends GetxService {
         '/login/renew',
         headers: {
           'Content-Type': 'application/json',
-          'x-token': tokenAlmacenado
+          'x-token': tokenAlmacenado,
         },
       );
 
@@ -137,7 +142,9 @@ class AuthService extends GetxService {
 
         usuario.value = loginResponse.usuario;
         await _guardarToken(loginResponse.token);
-
+        //Manejamos aquí el FCM token para notificaciones push
+        await _fcm.requestPermission();
+        await _fcm.registerToken();
         return true;
       } else {
         // Si no se renovó bien, forzamos logout local

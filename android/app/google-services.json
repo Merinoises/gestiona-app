@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463443754111",
+    "project_id": "gestiona-piscinas",
+    "storage_bucket": "gestiona-piscinas.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463443754111:android:180ceb80f6ae806d4d534a",
+        "android_client_info": {
+          "package_name": "com.antonio.gestionapiscinas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwnk02H2znwatlBCWkiFf5BYxezxn_FTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

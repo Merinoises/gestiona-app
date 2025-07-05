@@ -125,4 +125,6 @@ class Usuario {
     // 3) A 9 €/hora:
     return horasExactas * 9.0;
   }
+
+  
 }
