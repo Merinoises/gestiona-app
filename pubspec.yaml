@@ -1,7 +1,7 @@
 name: gestiona_app
 description: "App de gestión de piscinas y socorristas para ayuntamientos y empresas."
 publish_to: 'none'
-version: 2.2.0+13
+version: 2.2.0+14
 
 environment:
   sdk: ^3.8.0
